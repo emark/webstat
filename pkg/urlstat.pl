@@ -1,12 +1,12 @@
-#Модуль статистики голосований постов
-package PostStat;
+#Модуль статистики кликабельности постов
+package UrlStat;
 use strict;
 #Database description
 my $dbh=undef;
 my $sth=undef;
 my $ref=undef;
 my $SQL='';
-    
+
 BEGIN;
 
 sub Init()
@@ -14,23 +14,21 @@ sub Init()
     #Connection with database
     $dbh=DBI->connect("DBI:mysql:database=COMMON;host=localhost","root","admin");
     $dbh->trace();
-    &QueryTopList();
+    &QueryClickability('URL');
 }
 
-sub QueryTopList()
+sub QueryClickability()
 {
-    $SQL="SELECT URL,SUM(ANSWER) AS SUM,COUNT(ANSWER) AS COUNT FROM POSTSTAT GROUP BY URL ORDER BY SUM DESC";
-    #print $SQL;
-    $sth=$dbh->prepare($SQL);
+    $SQL="SELECT $_[0],COUNT(URL) AS CLICKABILITY FROM URLSTAT GROUP BY $_[0] ORDER BY CLICKABILITY DESC";
+    $sth=$dbh->prepare($SQL);#print $SQL;
     $sth->execute();
     while ($ref=$sth->fetchrow_hashref)
     {
-        $ref->{'URL'}=~/(\/\d+\/\d+\/.*\/)/;
-        print "$1\t$ref->{'SUM'}\t$ref->{'COUNT'}\n";
+        print "$ref->{$_[0]}\t$ref->{'CLICKABILITY'}\n";
     }
     return 1;
 }
-
+    
 sub Disconnect()
 {
     $ref=undef;
