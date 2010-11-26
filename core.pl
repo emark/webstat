@@ -1,18 +1,11 @@
 #!/usr/bin/perl -w
 use strict;
 use DBI;
+use CGI;
 require 'pkg/poststat.pl';
 
-my $dbh=undef;#Database description
-my $sth=undef;
-my $ref=undef;
+my $query=new CGI;
+#print $query->header();
+#print $query->pre;
 
-#Connection with database
-$dbh=DBI->connect("DBI:mysql:database=COMMON;host=localhost","root","admin");
-$dbh->trace();
-$sth=$dbh->prepare(PostStat::TopList());
-$sth->execute();
-while ($ref=$sth->fetchrow_hashref)
-{
-    print "$ref->{'URL'}\t$ref->{'SUM'}\t$ref->{'COUNT'}\n";
-}
+&PostStat::Init;
