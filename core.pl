@@ -8,6 +8,14 @@ require 'pkg/urlstat.pl';
 my $query=new CGI;
 print $query->header();
 print $query->pre;
+my $page=$query->param('page');
+my $module=$query->param('module');
 
-#&PostStat::Init;
-&UrlStat::Init;
+if($module eq 'poststat')
+{
+    &PostStat::Init;
+}
+elsif($module eq 'urlstat')
+{
+    &UrlStat::Init($page);    
+}

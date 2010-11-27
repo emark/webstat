@@ -15,19 +15,24 @@ sub Init()
     $dbh=DBI->connect("DBI:mysql:database=COMMON;host=localhost","root","admin");
     $dbh->trace();
     &QueryTopList();
+    &Disconnect;
 }
 
 sub QueryTopList()
 {
+    my $n=0;
     $SQL="SELECT URL,SUM(ANSWER) AS SUM,COUNT(ANSWER) AS COUNT FROM POSTSTAT GROUP BY URL ORDER BY SUM DESC";
     #print $SQL;
     $sth=$dbh->prepare($SQL);
     $sth->execute();
+    print '<table border=1 width=100%>';
     while ($ref=$sth->fetchrow_hashref)
     {
+        $n++;
         $ref->{'URL'}=~/(\/\d+\/\d+\/.*\/)/;
-        print "$1\t$ref->{'SUM'}\t$ref->{'COUNT'}\n";
+        print "<tr><td>$n</td><td>$1</td><td>$ref->{'SUM'}</td><td>$ref->{'COUNT'}</td></tr>\n";
     }
+    print '</table>';
     return 1;
 }
 
