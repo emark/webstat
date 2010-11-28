@@ -15,7 +15,14 @@ sub HTMLDisplay()#Generate HTML headers & content
 {
     print $query->header();
     print $query->start_form;
-    print '<SELECT ID=module NAME=module>';
+    print $query->textfield(-name=>'date_in',
+                          -size=>8,
+                          -maxlength=>10);
+    print '&nbsp;-&nbsp;';
+    print $query->textfield(-name=>'date_out',
+                          -size=>8,
+                          -maxlength=>10);
+    print '<P><SELECT ID=module NAME=module>';
     foreach my $key(@modules)
     {
         print "<OPTION VALUE='$key'";
@@ -25,9 +32,11 @@ sub HTMLDisplay()#Generate HTML headers & content
         }
         print ">$key</OPTION>";
     }
-    print '</SELECT>';
+    print '</SELECT>&nbsp;';
     print $query->submit();
     print $query->end_form;
+    print '</P>';
+    print "<P align=center class=caption>Report for $module</P>";
     &StartModule;
 }
 

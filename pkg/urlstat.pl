@@ -16,6 +16,10 @@ sub Init()
     my @pages=('URL','REFERER');
     $dbh=DBI->connect("DBI:mysql:database=COMMON;host=localhost","root","admin");
     $dbh->trace();
+    foreach my $key(@pages)
+    {
+        #print "<a href=\"\">$key</a>&nbsp";
+    }
     &QueryClickability($pages[$_[0]]);
     &Disconnect;
 }
@@ -28,7 +32,7 @@ sub QueryClickability()
     my %domain=('URL'=>'http://',
                 'REFERER'=>'http://www.web2buy.ru'
                );
-    $SQL="SELECT $_[0],COUNT(URL) AS CLICKABILITY FROM URLSTAT GROUP BY $_[0] ORDER BY CLICKABILITY DESC";
+    $SQL="SELECT $_[0],COUNT(URL) AS CLICKABILITY FROM URLSTAT GROUP BY $_[0] ORDER BY CLICKABILITY DESC LIMIT 20";
     $sth=$dbh->prepare($SQL);#print $SQL;
     $sth->execute();
     print '<table border=1 width=100%>';
