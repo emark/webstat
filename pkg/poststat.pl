@@ -21,7 +21,7 @@ sub Init()
 sub QueryTopList()
 {
     my $n=0;
-    $SQL="SELECT URL,SUM(ANSWER) AS SUM,COUNT(ANSWER) AS COUNT FROM POSTSTAT GROUP BY URL ORDER BY SUM DESC";
+    $SQL="SELECT URL,SUM(ANSWER) AS SUM,COUNT(ANSWER) AS COUNT FROM POSTSTAT GROUP BY URL ORDER BY SUM DESC LIMIT 10";
     #print $SQL;
     $sth=$dbh->prepare($SQL);
     $sth->execute();
