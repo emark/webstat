@@ -6,7 +6,8 @@ my $dbh=undef;
 my $sth=undef;
 my $ref=undef;
 my $SQL='';
-    
+my $module='PostStat';
+
 BEGIN;
 
 sub Init()
@@ -45,5 +46,5 @@ sub Disconnect()
     print 'Connection close';
 }
 
-return 1;
+return $module;
 END;

@@ -6,6 +6,7 @@ my $dbh=undef;
 my $sth=undef;
 my $ref=undef;
 my $SQL='';
+my $module='UrlStat';
 
 BEGIN;
 
@@ -50,5 +51,5 @@ sub Disconnect()
     print 'Connection close';
 }
 
-return 1;
+return $module;
 END;

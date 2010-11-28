@@ -2,14 +2,22 @@
 use strict;
 use DBI;
 use CGI;
-require 'pkg/poststat.pl';
-require 'pkg/urlstat.pl';
 
+my @modules=(require 'pkg/poststat.pl',
+             require 'pkg/urlstat.pl'
+             );
 my $query=new CGI;
 print $query->header();
 print $query->pre;
 my $page=$query->param('page');
 my $module=$query->param('module');
+
+print '<SELECT>';
+foreach my $key(@modules)
+{
+    print "<OPTION VALUE='$key'>$key</OPTION>";
+}
+print '</SELECT>';
 
 if($module eq 'poststat')
 {
