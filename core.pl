@@ -2,13 +2,19 @@
 use strict;
 use DBI;
 use CGI;
+require 'pkg/datecal.pl';
 
 my @modules=(require 'pkg/poststat.pl',
              require 'pkg/urlstat.pl'
              );
+
 my $query=new CGI;
 my $page=$query->param('page');
 my $module=$query->param('module');
+&Datecal::GetDates=($query->param('date_in'),
+                    $query->param('date_out')
+                    );
+
 &HTMLDisplay;
 
 sub HTMLDisplay()#Generate HTML headers & content
@@ -17,10 +23,12 @@ sub HTMLDisplay()#Generate HTML headers & content
     print $query->start_form;
     print $query->textfield(-name=>'date_in',
                           -size=>8,
+                          -value=>&Datecal::DateIn,
                           -maxlength=>10);
     print '&nbsp;-&nbsp;';
     print $query->textfield(-name=>'date_out',
                           -size=>8,
+                          -value=>&Datecal::DateOut,
                           -maxlength=>10);
     print '<P><SELECT ID=module NAME=module>';
     foreach my $key(@modules)
@@ -42,16 +50,17 @@ sub HTMLDisplay()#Generate HTML headers & content
 
 sub StartModule()#Starting selected module
 {
+    
     if($module eq $modules[0])
     {
-        &PostStat::Init($page);    
+        &PostStat::Init(Datecal::Period(),$page);    
     }
     elsif($module eq $modules[1])
     {
-        &UrlStat::Init($page);    
+        &UrlStat::Init(Datecal::Period(),$page);    
     }
     else#Default module
     {
-        &PostStat::Init;
+        &PostStat::Init(Datecal::Period(),$page);
     }
 }
