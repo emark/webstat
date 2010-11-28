@@ -1,0 +1,5 @@
+remove remote branch
+#git push origin :branch
+
+add remote branch
+#git push origin branch
