@@ -7,23 +7,42 @@ my @modules=(require 'pkg/poststat.pl',
              require 'pkg/urlstat.pl'
              );
 my $query=new CGI;
-print $query->header();
-print $query->pre;
 my $page=$query->param('page');
 my $module=$query->param('module');
+&HTMLDisplay;
 
-print '<SELECT>';
-foreach my $key(@modules)
+sub HTMLDisplay()#Generate HTML headers & content
 {
-    print "<OPTION VALUE='$key'>$key</OPTION>";
+    print $query->header();
+    print $query->start_form;
+    print '<SELECT ID=module NAME=module>';
+    foreach my $key(@modules)
+    {
+        print "<OPTION VALUE='$key'";
+        if($module eq $key)
+        {
+            print ' selected ';
+        }
+        print ">$key</OPTION>";
+    }
+    print '</SELECT>';
+    print $query->submit();
+    print $query->end_form;
+    &StartModule;
 }
-print '</SELECT>';
 
-if($module eq 'poststat')
+sub StartModule()#Starting selected module
 {
-    &PostStat::Init;
-}
-elsif($module eq 'urlstat')
-{
-    &UrlStat::Init($page);    
+    if($module eq $modules[0])
+    {
+        &PostStat::Init($page);    
+    }
+    elsif($module eq $modules[1])
+    {
+        &UrlStat::Init($page);    
+    }
+    else#Default module
+    {
+        &PostStat::Init;
+    }
 }
