@@ -2,16 +2,18 @@
 use strict;
 use DBI;
 use CGI;
+use constant VERSION=>1.0;
 require 'pkg/datecal.pl';
+require 'pkg/syspkg.pl';
 
 my @modules=(require 'pkg/poststat.pl',
              require 'pkg/urlstat.pl'
              );
 
 my $query=new CGI;
-my $page=$query->param('page');
 my $module=$query->param('module');
-&Datecal::GetDates=($query->param('date_in'),
+my $modoption=$query->param('modoption');#Module option parameters
+&Datecal::GetDates($query->param('date_in'),
                     $query->param('date_out')
                     );
 
@@ -19,8 +21,13 @@ my $module=$query->param('module');
 
 sub HTMLDisplay()#Generate HTML headers & content
 {
-    print $query->header();
-    print $query->start_form;
+    print $query->header(-charset=>'UTF-8');
+    print '<P>';
+    &Datecal::PresetDates($module);
+    print '</P>';
+    print $query->start_form(-method=>'post',
+                             -action=>'?'
+                             );
     print $query->textfield(-name=>'date_in',
                           -size=>8,
                           -value=>&Datecal::DateIn,
@@ -44,23 +51,22 @@ sub HTMLDisplay()#Generate HTML headers & content
     print $query->submit();
     print $query->end_form;
     print '</P>';
-    print "<P align=center class=caption>Report for $module</P>";
     &StartModule;
 }
 
 sub StartModule()#Starting selected module
 {
-    
+    print "<P align=center class=caption>Report for $module</P>";
     if($module eq $modules[0])
     {
-        &PostStat::Init(Datecal::Period(),$page);    
+        &PostStat::Init(Datecal::Period(),$modoption);    
     }
     elsif($module eq $modules[1])
     {
-        &UrlStat::Init(Datecal::Period(),$page);    
+        &UrlStat::Init(Datecal::Period(),$modoption);    
     }
     else#Default module
     {
-        &PostStat::Init(Datecal::Period(),$page);
+        &PostStat::Init(Datecal::Period(),$modoption);
     }
 }
