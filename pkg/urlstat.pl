@@ -45,7 +45,7 @@ sub QueryClickability()
                 'REFERER'=>'http://www.web2buy.ru'
                );
     $SQL="SELECT $_[2],COUNT(URL) AS CLICKABILITY FROM URLSTAT WHERE LENGTH(REFERER)>0 AND DATE>='$_[0]' AND DATE<='$_[1]'
-            GROUP BY $_[2] ORDER BY CLICKABILITY DESC LIMIT 20";
+            GROUP BY $_[2] ORDER BY CLICKABILITY DESC";
     $sth=$dbh->prepare($SQL);#print $SQL;
     $sth->execute();
     if($sth->rows)
