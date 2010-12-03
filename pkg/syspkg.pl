@@ -7,7 +7,7 @@ sub DBconf()
 {
     my @production=('DBI:mysql:database=COMMON;host=localhost','service','RrFTkLX2');
     my @develop=('DBI:mysql:database=COMMON;host=localhost','root','admin');
-    return @develop;
+    return @production;
 }
 
 #Подсветка таблицы "зеброй" в строках
