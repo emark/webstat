@@ -1,6 +1,6 @@
 package Syspkg;
 use strict;
-use constant VERSION=>1.0;
+use constant VERSION=>1.1;
 BEGIN;
 
 sub DBconf()
