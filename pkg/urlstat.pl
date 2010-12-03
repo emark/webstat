@@ -1,7 +1,7 @@
 #Модуль статистики кликабельности постов
 package UrlStat;
 use strict;
-use constant VERSION=>1.04;
+use constant VERSION=>1.05;
 
 #Database description
 my $dbh=undef;
@@ -9,6 +9,7 @@ my $sth=undef;
 my $ref=undef;
 my $SQL='';
 my $module='Clickability';
+my $modoption=undef;
 
 BEGIN;
 
@@ -25,11 +26,12 @@ sub Init()
                );
     $dbh=DBI->connect(&Syspkg::DBconf);
     $dbh->trace();
-    print "<P align=center><i>$_[2]</i></P>\n";
+    print "<P align=center>";
     foreach my $key(keys %pages)
     {
         print "<a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$key\">$key</a>&nbsp";
     }
+    print "<br>--<i>$_[2]</i>--</P>";
     &QueryClickability($_[0],$_[1],$pages{$_[2]});
     &Disconnect;
 }
@@ -40,6 +42,7 @@ sub QueryClickability()
 {
     my $name='';
     my $n=0;
+    my $bgcolor=0;
     my $totalclicks=0;
     my %domain=('URL'=>'http://',
                 'REFERER'=>'http://www.web2buy.ru'
@@ -54,9 +57,10 @@ sub QueryClickability()
         while ($ref=$sth->fetchrow_hashref)
         {
             $n++;
+            $bgcolor=&Syspkg::Rowcolor($n);
             $name=substr($ref->{$_[2]},0,250);
             $totalclicks=$totalclicks+$ref->{'CLICKABILITY'};
-            print "<tr><td>$n</td><td><a href=\"$domain{$_[2]}$ref->{$_[2]}\" target=_blank>$name</a></td><td>$ref->{'CLICKABILITY'}</td></tr>\n";
+            print "<tr bgcolor=$bgcolor><td>$n</td><td><a href=\"$domain{$_[2]}$ref->{$_[2]}\" target=_blank>$name</a></td><td>$ref->{'CLICKABILITY'}</td></tr>\n";
         }
         print "<tr><td colspan=2 align=center><i>Total clicks</i></td><td><b>$totalclicks</b></td></tr></table>\n";
     }

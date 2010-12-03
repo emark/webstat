@@ -11,7 +11,16 @@ sub DBconf()
 #Подсветка таблицы "зеброй" в строках
 sub Rowcolor()
 {
-    my @bgcolor=('#005566','#ffffff');
+    my $color=0;
+    if($_[0] & 1)
+    {
+        $color='#FFFFFF'
+    }
+    else
+    {
+        $color='#F0F0F0'
+    }
+    return $color;
 }
 
 return 1;

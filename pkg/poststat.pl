@@ -1,7 +1,7 @@
 #Модуль статистики голосований постов
 package PostStat;
 use strict;
-use constant VERSION=>1.03;
+use constant VERSION=>1.04;
 
 #Database description
 my $dbh=undef;
@@ -29,6 +29,7 @@ sub QueryTopList()
     my $totalsum=0;
     my $totalcount=0;
     my $percent=0;
+    my $bgcolor=0;
     $SQL="SELECT URL,SUM(ANSWER) AS SUM,COUNT(ANSWER) AS COUNT FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]'
             GROUP BY URL ORDER BY SUM DESC LIMIT 10";#print $SQL;
     $sth=$dbh->prepare($SQL);
@@ -39,14 +40,15 @@ sub QueryTopList()
         while ($ref=$sth->fetchrow_hashref)
         {
             $n++;
+            $bgcolor=&Syspkg::Rowcolor($n);
             $totalsum=$totalsum+$ref->{'SUM'};
             $totalcount=$totalcount+$ref->{'COUNT'};
             $ref->{'URL'}=~/(\/\d+\/\d+\/.*\/)/;
-            print "<tr><td>$n</td><td>$1</td><td>$ref->{'SUM'}</td><td>$ref->{'COUNT'}</td></tr>\n";
+            print "<tr bgcolor=$bgcolor><td>$n</td><td>$1</td><td>$ref->{'SUM'}</td><td>$ref->{'COUNT'}</td></tr>\n";
         }
         $percent=($totalsum/$totalcount)*100;
         $percent=sprintf("%.2f%",$percent);
-        print "<tr><td colspan=2 align=center><i>Total votes ($percent)</i></td><td><b>$totalsum</b></td><td><b>$totalcount</b></td></tr></table>\n";
+        print "<tr><td colspan=2 align=center><i>Total votes ($percent)</i></td><td><b>$totalsum+</b></td><td><b>$totalcount</b></td></tr></table>\n";
     }
     else
     {
