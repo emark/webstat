@@ -1,0 +1,13 @@
+table {
+    border:0px;
+}
+a:hover,a:link,a:visited,a:active{
+    color:#0066CC;
+}
+.presetdates a{
+    color:#BF3B3B;
+    /*background-color:#ffffdd*/
+}
+.sysmsg{
+    font-size:12px;
+}

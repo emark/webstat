@@ -22,7 +22,10 @@ my $modoption=$query->param('modoption');#Module option parameters
 sub HTMLDisplay()#Generate HTML headers & content
 {
     print $query->header(-charset=>'UTF-8');
-    print '<P>';
+    print $query->start_html(-title=>'Webstat',
+                             -style=>'/stat/style.css'
+                             );
+    print '<P class=presetdates>';
     &Datecal::PresetDates($module);
     print '</P>';
     print $query->start_form(-method=>'post',

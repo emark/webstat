@@ -36,7 +36,7 @@ sub QueryTopList()
     $sth->execute();
     if($sth->rows)
     {
-        print '<table border=1 width=100%>';
+        print '<table border=0 width=100%>';
         while ($ref=$sth->fetchrow_hashref)
         {
             $n++;
@@ -47,8 +47,8 @@ sub QueryTopList()
             print "<tr bgcolor=$bgcolor><td>$n</td><td>$1</td><td>$ref->{'SUM'}</td><td>$ref->{'COUNT'}</td></tr>\n";
         }
         $percent=($totalsum/$totalcount)*100;
-        $percent=sprintf("%.2f%",$percent);
-        print "<tr><td colspan=2 align=center><i>Total votes ($percent)</i></td><td><b>$totalsum+</b></td><td><b>$totalcount</b></td></tr></table>\n";
+        $percent=int($percent);
+        print "<tr><td colspan=2 align=center><i>Total votes ($percent%)</i></td><td><b>$totalsum+</b></td><td><b>$totalcount</b></td></tr></table>\n";
     }
     else
     {

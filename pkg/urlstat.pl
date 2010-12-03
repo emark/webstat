@@ -23,9 +23,12 @@ sub Init()
                'Posts'=>'REFERER',
                ''=>'URL'#default page
                );
-    my @modoption=split (/:/,$_[2]);
-    $modoption=$_[2];#Определяем глобальную переменную
-    
+    my @modoption=('','');
+    if($_[2])
+    {
+        @modoption=split (/:/,$_[2]);
+        $modoption=$_[2];#Определяем глобальную переменную    
+    }    
     $dbh=DBI->connect(&Syspkg::DBconf);
     $dbh->trace();
     print "<P align=center>";
@@ -33,7 +36,7 @@ sub Init()
     {
         print "<a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$key\">$key</a>&nbsp";
     }
-    print "<br>--<i>$_[2]</i>--</P>";
+    print "<br>--<i>$modoption[0]</i>--</P>";
     &QueryClickability($_[0],$_[1],$pages{$modoption[0]},$modoption[1]);
     &Disconnect;
 }
@@ -55,7 +58,7 @@ sub QueryClickability()
     $sth->execute();
     if($sth->rows)
     {
-        print '<table border=1 width=100%>';
+        print '<table border=0 width=100%>';
         while ($ref=$sth->fetchrow_hashref)
         {
             $n++;
@@ -69,7 +72,7 @@ sub QueryClickability()
         }
         if(!$_[3])
         {
-            print "<tr align=center><td colspan=3><a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$modoption:expand\">more...</a></td></td></tr>\n";
+            print "<tr align=center><td colspan=2><a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$modoption:expand\">more...</a></td><td>...</td></tr>\n";
         }
         print "<tr><td colspan=2 align=center><i>Total clicks</i></td><td><b>$totalclicks</b></td></tr></table>\n";    }
     else
