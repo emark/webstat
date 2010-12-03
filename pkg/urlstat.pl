@@ -9,21 +9,23 @@ my $sth=undef;
 my $ref=undef;
 my $SQL='';
 my $module='Clickability';
-my $modoption=undef;
+my $modoption=0;
 
 BEGIN;
 
 #Процедура инициализации модуля
-#USAGE: $date_in,$date_out,$modoption(EXP)
+#USAGE: $date_in,$date_out,$modoption(EXP,expand)
 #EXP: URL, REFERER
 sub Init()
 {
-    #Connection with database
     #pages - хеш страниц модуля. alias=>MODULE_NAME
     my %pages=('Shop URL'=>'URL',
                'Posts'=>'REFERER',
                ''=>'URL'#default page
                );
+    my @modoption=split (/:/,$_[2]);
+    $modoption=$_[2];#Определяем глобальную переменную
+    
     $dbh=DBI->connect(&Syspkg::DBconf);
     $dbh->trace();
     print "<P align=center>";
@@ -32,11 +34,11 @@ sub Init()
         print "<a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$key\">$key</a>&nbsp";
     }
     print "<br>--<i>$_[2]</i>--</P>";
-    &QueryClickability($_[0],$_[1],$pages{$_[2]});
+    &QueryClickability($_[0],$_[1],$pages{$modoption[0]},$modoption[1]);
     &Disconnect;
 }
 #Процедура подсчета кликабельности
-#USAGE: $date_in,$date_out,$page(EXP)
+#USAGE: $date_in,$date_out,$page(EXP),$expand
 #EXP: URL, REFERER
 sub QueryClickability()
 {
@@ -60,10 +62,16 @@ sub QueryClickability()
             $bgcolor=&Syspkg::Rowcolor($n);
             $name=substr($ref->{$_[2]},0,250);
             $totalclicks=$totalclicks+$ref->{'CLICKABILITY'};
-            print "<tr bgcolor=$bgcolor><td>$n</td><td><a href=\"$domain{$_[2]}$ref->{$_[2]}\" target=_blank>$name</a></td><td>$ref->{'CLICKABILITY'}</td></tr>\n";
+            if($n<=20 || $_[3])
+            {
+                print "<tr bgcolor=$bgcolor><td>$n</td><td><a href=\"$domain{$_[2]}$ref->{$_[2]}\" target=_blank>$name</a></td><td>$ref->{'CLICKABILITY'}</td></tr>\n";
+            }
         }
-        print "<tr><td colspan=2 align=center><i>Total clicks</i></td><td><b>$totalclicks</b></td></tr></table>\n";
-    }
+        if(!$_[3])
+        {
+            print "<tr align=center><td colspan=3><a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$modoption:expand\">more...</a></td></td></tr>\n";
+        }
+        print "<tr><td colspan=2 align=center><i>Total clicks</i></td><td><b>$totalclicks</b></td></tr></table>\n";    }
     else
     {
         print '<P align=center class=message>Данные за выбраный период отсутствуют.</P>';
