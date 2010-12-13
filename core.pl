@@ -6,7 +6,7 @@ use constant VERSION=>1.0;
 require 'pkg/datecal.pl';
 require 'pkg/syspkg.pl';
 
-my @modules=(require 'pkg/poststat.pl',
+my @modules=(require 'pkg/loyalty.pl',
              require 'pkg/urlstat.pl'
              );
 
@@ -62,7 +62,7 @@ sub StartModule()#Starting selected module
     print "<P align=center class=caption>Report for $module</P>";
     if($module eq $modules[0])
     {
-        &PostStat::Init(Datecal::Period(),$modoption);    
+        &Loyalty::Init(Datecal::Period(),$modoption);    
     }
     elsif($module eq $modules[1])
     {
@@ -70,6 +70,6 @@ sub StartModule()#Starting selected module
     }
     else#Default module
     {
-        &PostStat::Init(Datecal::Period(),$modoption);
+        &Loyalty::Init(Datecal::Period(),$modoption);
     }
 }

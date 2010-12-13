@@ -1,14 +1,14 @@
-#Модуль статистики голосований постов
-package PostStat;
+#Модуль статистики голосований постов *Лояльность*
+package Loyalty;
 use strict;
-use constant VERSION=>1.04;
+use constant VERSION=>1.06;
 
 #Database description
 my $dbh=undef;
 my $sth=undef;
 my $ref=undef;
 my $SQL='';
-my $module='Post rating';
+my $module='Loyalty';
 
 BEGIN;
 
