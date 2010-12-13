@@ -6,31 +6,56 @@ use constant VERSION=>1.01;
 
 my $date_in=undef;
 my $date_out=undef;
+my $date_diff=undef;#Разница дней периода
+my $date_forward=undef;
+my $date_rewind=undef;
 
+#&GetDates('2010-10-01','2010-12-01');
+#&Forward;
+#&Rewind;
 BEGIN;
 
 #Процедура валидации и проверки временного интервала
 #USAGE: (date_in,date_out)
 sub GetDates()
 {
+    my($y,$m,$d)='';
     if(!$_[0])
     {
-        $date_in=DateTime->now()->ymd;
+        $date_in=DateTime->now();
     }
     else
     {
-        $date_in=$_[0];
+        ($y,$m,$d)=split('-',$_[0]);
+        $date_in=DateTime->new(year=>$y,
+                                month=>$m,
+                                day=>$d,
+                                hour=>0,
+                                minute=>0
+                                );
     }
+    
     if(!$_[1])
     {
         $date_out=DateTime->now();
         $date_out->add(days=>1);
-        $date_out=$date_out->ymd;
     }
     else
     {
-        $date_out=$_[1];
+        ($y,$m,$d)=split('-',$_[1]);
+        $date_out=DateTime->new(year=>$y,
+                                month=>$m,
+                                day=>$d,
+                                hour=>0,
+                                minute=>0
+                                );
     }
+    $date_diff=$date_out-$date_in;
+    $date_forward=$date_out->clone->add($date_diff)->ymd;
+    $date_rewind=$date_in->clone->subtract($date_diff)->ymd;
+    
+    $date_in=$date_in->ymd;
+    $date_out=$date_out->ymd;
     return 1;
 }
 
@@ -74,6 +99,20 @@ sub PresetDates()
         ($preset,$date_in,$date_out)=split(/;/,$key);
         print "<a href=\"?date_in=$date_in&date_out=$date_out&module=$module\">$preset</a>&nbsp;\n";
     }
+    return 1;
+}
+
+sub Forward()#Перемотка периода вперед
+{
+    my $module=$_[0];
+    print "&nbsp;<a href=\"?date_in=$date_out&date_out=$date_forward&module=$module\">Forward</a>";
+    return 1;
+}
+
+sub Rewind()#Перемотка периода назад
+{
+    my $module=$_[0];
+    print "<a href=\"?date_in=$date_rewind&date_out=$date_in&module=$module\">Back</a>&nbsp;";
     return 1;
 }
 

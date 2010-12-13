@@ -25,22 +25,12 @@ sub HTMLDisplay()#Generate HTML headers & content
     print $query->start_html(-title=>'Webstat',
                              -style=>'/stat/style.css'
                              );
-    print '<P class=presetdates>';
-    &Datecal::PresetDates($module);
-    print '</P>';
     print $query->start_form(-method=>'post',
                              -action=>'?'
                              );
-    print $query->textfield(-name=>'date_in',
-                          -size=>8,
-                          -value=>&Datecal::DateIn,
-                          -maxlength=>10);
-    print '&nbsp;-&nbsp;';
-    print $query->textfield(-name=>'date_out',
-                          -size=>8,
-                          -value=>&Datecal::DateOut,
-                          -maxlength=>10);
-    print '<P><SELECT ID=module NAME=module>';
+    print '<P class=presetdates>';
+    &Datecal::PresetDates($module);
+    print '</P><P><SELECT ID=module NAME=module>';
     foreach my $key(@modules)
     {
         print "<OPTION VALUE='$key'";
@@ -52,6 +42,18 @@ sub HTMLDisplay()#Generate HTML headers & content
     }
     print '</SELECT>&nbsp;';
     print $query->submit();
+    print '</P><P align=center>';
+    &Datecal::Rewind($module);
+    print $query->textfield(-name=>'date_in',
+                          -size=>12,
+                          -value=>&Datecal::DateIn,
+                          -maxlength=>10);
+    print '&nbsp;-&nbsp;';
+    print $query->textfield(-name=>'date_out',
+                          -size=>12,
+                          -value=>&Datecal::DateOut,
+                          -maxlength=>10);
+    &Datecal::Forward($module);
     print $query->end_form;
     print '</P>';
     &StartModule;
