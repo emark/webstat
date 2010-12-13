@@ -9,7 +9,7 @@ my $sth=undef;
 my $ref=undef;
 my $SQL='';
 my $module='Clickability';
-my $modoption=0;
+my $modoption='';
 
 BEGIN;
 
@@ -49,6 +49,7 @@ sub QueryClickability()
     my $n=0;
     my $bgcolor=0;
     my $totalclicks=0;
+    my $rowlimit=20;#Ограничение на первичный вывод строк
     my %domain=('URL'=>'http://',
                 'REFERER'=>'http://www.web2buy.ru'
                );
@@ -62,16 +63,17 @@ sub QueryClickability()
         while ($ref=$sth->fetchrow_hashref)
         {
             $n++;
-            $bgcolor=&Syspkg::Rowcolor($n);
+            $bgcolor=&Syspkg::Rowcolor($n);#Подсветка строк таблицы
             $name=substr($ref->{$_[2]},0,250);
             $totalclicks=$totalclicks+$ref->{'CLICKABILITY'};
-            if($n<=20 || $_[3])
+            if($n<=$rowlimit || $_[3])
             {
                 print "<tr bgcolor=$bgcolor><td>$n</td><td><a href=\"$domain{$_[2]}$ref->{$_[2]}\" target=_blank>$name</a></td><td>$ref->{'CLICKABILITY'}</td></tr>\n";
             }
         }
         if(!$_[3])
         {
+            $n=$n-$rowlimit;
             print "<tr align=center><td colspan=2><a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$modoption:expand\">more...($n)</a></td><td>...</td></tr>\n";
         }
         print "<tr><td colspan=2 align=center><i>Total clicks</i></td><td><b>$totalclicks</b></td></tr></table>\n";    }
