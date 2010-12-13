@@ -1,5 +1,5 @@
 #Модуль статистики кликабельности постов
-package UrlStat;
+package Clickability;
 use strict;
 use constant VERSION=>1.05;
 
