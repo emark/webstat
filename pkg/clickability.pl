@@ -71,7 +71,7 @@ sub QueryClickability()
                 print "<tr bgcolor=$bgcolor><td>$n</td><td><a href=\"$domain{$_[2]}$ref->{$_[2]}\" target=_blank>$name</a></td><td>$ref->{'CLICKABILITY'}</td></tr>\n";
             }
         }
-        if(!$_[3])
+        if(!$_[3] && $n>$rowlimit)#Если строк меньше rowlimit, не показыаем тег more
         {
             $n=$n-$rowlimit;
             print "<tr align=center><td colspan=2><a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$modoption:expand\">more...($n)</a></td><td>...</td></tr>\n";
