@@ -2,7 +2,7 @@
 use strict;
 use DBI;
 use CGI;
-use constant VERSION=>1.0;
+use constant VERSION=>1.1;
 require 'pkg/datecal.pl';
 require 'pkg/syspkg.pl';
 

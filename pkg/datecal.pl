@@ -105,14 +105,14 @@ sub PresetDates()
 sub Forward()#Перемотка периода вперед
 {
     my $module=$_[0];
-    print "&nbsp;<a href=\"?date_in=$date_out&date_out=$date_forward&module=$module\">Forward</a>";
+    print "&nbsp;<a href=\"?date_in=$date_out&date_out=$date_forward&module=$module\">Fwd</a>";
     return 1;
 }
 
 sub Rewind()#Перемотка периода назад
 {
     my $module=$_[0];
-    print "<a href=\"?date_in=$date_rewind&date_out=$date_in&module=$module\">Back</a>&nbsp;";
+    print "<a href=\"?date_in=$date_rewind&date_out=$date_in&module=$module\">Rwd</a>&nbsp;";
     return 1;
 }
 
