@@ -30,8 +30,9 @@ sub QueryTopList()
     my $totalcount=0;
     my $percent=0;
     my $bgcolor=0;
+    my $rowlimit=20;#Ограничение на первичный вывод строк
     $SQL="SELECT URL,SUM(ANSWER) AS SUM,COUNT(ANSWER) AS COUNT FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]'
-            GROUP BY URL ORDER BY SUM DESC LIMIT 10";#print $SQL;
+            GROUP BY URL ORDER BY SUM DESC";#print $SQL;
     $sth=$dbh->prepare($SQL);
     $sth->execute();
     if($sth->rows)
