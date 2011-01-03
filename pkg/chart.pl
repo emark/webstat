@@ -44,18 +44,38 @@ sub Init()
 #Процедура визуализации данных 
 sub BuildChart()
 {
-    my %RANGE=('POSTSTAT'=>"COUNT(ANSWER) AS ANSWERCOUNT, SUM(ANSWER) AS ANSWERSUM FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]'",
-             'URLSTAT'=>"COUNT(URL) AS URLCOUNT FROM URLSTAT WHERE LENGTH(REFERER)>0 AND DATE>='$_[0]' AND DATE<='$_[1]'",
-             );
-    $SQL="SELECT DATE_FORMAT(DATE,\'%Y-%m-%d\') AS FDATE, $RANGE{$_[2]} GROUP BY FDATE";
-    $sth=$dbh->prepare($SQL);print $SQL;
+    my $sum='';
+    my $count='';
+    my $start_month='';
+    my $finish_month='';
+    #my %RANGE=('POSTSTAT'=>"COUNT(ANSWER) AS ANSWERCOUNT, SUM(ANSWER) AS ANSWERSUM FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]'",
+    #         'URLSTAT'=>"COUNT(URL) AS URLCOUNT FROM URLSTAT WHERE LENGTH(REFERER)>0 AND DATE>='$_[0]' AND DATE<='$_[1]'",
+    #         );
+    #$SQL="SELECT DATE_FORMAT(DATE,\'%Y-%m-%d\') AS FDATE, $RANGE{$_[2]} GROUP BY FDATE";
+    $SQL="SELECT MONTH(DATE),SUM(ANSWER),COUNT(ANSWER) FROM POSTSTAT GROUP BY MONTH(DATE)";
+    $sth=$dbh->prepare($SQL);#print $SQL;
     $sth->execute;
     print '<pre>';
     while ($ref=$sth->fetchrow_arrayref)
     {
-        print "$ref->[0]\t$ref->[1]\t$ref->[2]\n";
+        #print "$ref->[0]\t$ref->[1]\t$ref->[2]\n";
+        $sum=$sum."$ref->[1],";
+        $count=$count."$ref->[2],";
+        if(!$start_month)
+        {
+            $start_month=$ref->[0];
+        }
+        else
+        {
+            $finish_month=$ref->[0];
+        }
     }
-    print '</pre>';
+    chop $sum;
+    chop $count;
+    print '</pre><center>';
+    print "<img src=\"http://chart.apis.google.com/chart?chxr=2,$start_month,$finish_month&chxt=y,r,x&chbh=a,7&chs=500x325&cht=bvg&chco=A2C180,3D7930&chd=t:$sum|$count&chg=5,5,0,0&chtt=Vertical+bar+chart\" width=\"500\" height=\"325\" alt=\"Vertical bar chart\" />";
+    #print "<img src=\"http://chart.apis.google.com/chart?chxr=2,$start_month,$finish_month&chxt=y,r,x&chbh=a,7&chs=500x325&cht=lc&chco=A2C180,3D7930&chd=t:$sum|$count&chg=5,5,0,0&chtt=Vertical+bar+chart\" width=\"500\" height=\"325\" alt=\"Vertical bar chart\" />";
+    print '</center>';
     return 1;
 }
 
