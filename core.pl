@@ -7,7 +7,8 @@ require 'pkg/datecal.pl';
 require 'pkg/syspkg.pl';
 
 my @modules=(require 'pkg/loyalty.pl',
-             require 'pkg/clickability.pl'
+             require 'pkg/clickability.pl',
+             require 'pkg/chart.pl'
              );
 
 my $query=new CGI;
@@ -69,6 +70,10 @@ sub StartModule()#Starting selected module
     elsif($module eq $modules[1])
     {
         &Clickability::Init(Datecal::Period(),$modoption);    
+    }
+    elsif($module eq $modules[2])
+    {
+        &Chart::Init(Datecal::Period(),$modoption);    
     }
     else#Default module
     {
