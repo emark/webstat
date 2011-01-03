@@ -1,7 +1,7 @@
 #Модуль статистики голосований постов *Лояльность*
 package Loyalty;
 use strict;
-use constant VERSION=>1.06;
+use constant VERSION=>1.07;
 
 #Database description
 my $dbh=undef;
@@ -9,15 +9,22 @@ my $sth=undef;
 my $ref=undef;
 my $SQL='';
 my $module='Loyalty';
+my $modoption='';
 
 BEGIN;
 
 sub Init()
 {
+    my @modoption=('','');
+    if($_[2])
+    {
+        @modoption=split (/:/,$_[2]);
+        $modoption=$_[2];#Определяем глобальную переменную    
+    }  
     #Connection with database
     $dbh=DBI->connect(&Syspkg::DBconf);
     $dbh->trace();
-    &QueryTopList($_[0],$_[1]);
+    &QueryTopList($_[0],$_[1],$modoption[1]);
     &Disconnect;
 }
 
@@ -30,7 +37,7 @@ sub QueryTopList()
     my $totalcount=0;
     my $percent=0;
     my $bgcolor=0;
-    my $rowlimit=20;#Ограничение на первичный вывод строк
+    my $rowlimit=10;#Ограничение на первичный вывод строк
     $SQL="SELECT URL,SUM(ANSWER) AS SUM,COUNT(ANSWER) AS COUNT FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]'
             GROUP BY URL ORDER BY SUM DESC";#print $SQL;
     $sth=$dbh->prepare($SQL);
@@ -45,7 +52,15 @@ sub QueryTopList()
             $totalsum=$totalsum+$ref->{'SUM'};
             $totalcount=$totalcount+$ref->{'COUNT'};
             $ref->{'URL'}=~/(\/\d+\/\d+\/.*\/)/;
-            print "<tr bgcolor=$bgcolor><td>$n</td><td>$1</td><td>$ref->{'SUM'}</td><td>$ref->{'COUNT'}</td></tr>\n";
+             if($n<=$rowlimit || $_[2])
+            {
+                print "<tr bgcolor=$bgcolor><td>$n</td><td>$1</td><td>$ref->{'SUM'}</td><td>$ref->{'COUNT'}</td></tr>\n";
+            }
+        }
+        if(!$_[2] && $n>$rowlimit)#Если строк меньше rowlimit, не показыаем тег more
+        {
+            $n=$n-$rowlimit;
+            print "<tr align=center><td colspan=2><a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$modoption:expand\">more ($n)</a></td><td colspan=2>...</td></tr>\n";
         }
         $percent=($totalsum/$totalcount)*100;
         $percent=int($percent);
