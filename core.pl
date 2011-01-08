@@ -2,7 +2,7 @@
 use strict;
 use DBI;
 use CGI;
-use constant VERSION=>1.1;
+use constant VERSION=>1.2;
 require 'pkg/datecal.pl';
 require 'pkg/syspkg.pl';
 
@@ -58,11 +58,12 @@ sub HTMLDisplay()#Generate HTML headers & content
     print $query->end_form;
     print '</P>';
     &StartModule;
+    print $query->end_html;
 }
 
 sub StartModule()#Starting selected module
 {
-    print "<P align=center class=caption>Report for $module</P>";
+    print "<P align=center class=caption>Module: $module</P>";
     if($module eq $modules[0])
     {
         &Loyalty::Init(Datecal::Period(),$modoption);    

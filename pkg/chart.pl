@@ -1,7 +1,8 @@
 #Модуль визуализации данных используя API Google Chart
+#Create with http://imagecharteditor.appspot.com/
 package Chart;
 use strict;
-use constant VERSION=>0.01;
+use constant VERSION=>0.2;
 
 #Database description
 my $dbh=undef;
@@ -18,10 +19,10 @@ BEGIN;
 #EXP: URL, REFERER
 sub Init()
 {
-    #pages - хеш страниц модуля. alias=>MODULE_NAME
-    my %pages=('Loyalty'=>'POSTSTAT',
-               'Clickability'=>'URLSTAT',
-               ''=>'POSTSTAT'#default page
+    #pages - инициализация страниц модуля. alias=>MODULE_NAME
+    my %pages=('Loyalty'=>'Loyalty',
+               'Clickability'=>'Clickability',
+               ''=>'Loyalty'#default page
                );
     my @modoption=('','');
     if($_[2])
@@ -37,31 +38,31 @@ sub Init()
         print "<a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$key\">$key</a>&nbsp";
     }
     print "<br>--<i>$modoption[0]</i>--</P>";
-    &BuildChart($_[0],$_[1],$pages{$modoption[0]},$modoption[1]);
+    &BuildChart($_[0],$_[1],$pages{$modoption[0]});
     &Disconnect;
 }
 
-#Процедура визуализации данных 
+#Процедура визуализации данных
+#USAGE: $date_in,$date_out,$modoption(page)
+#Pages: Loyalty, Clickability
 sub BuildChart()
 {
-    my $sum='';
-    my $count='';
+    my $var1='';
+    my $var2='';
     my $start_month='';
     my $finish_month='';
-    #my %RANGE=('POSTSTAT'=>"COUNT(ANSWER) AS ANSWERCOUNT, SUM(ANSWER) AS ANSWERSUM FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]'",
-    #         'URLSTAT'=>"COUNT(URL) AS URLCOUNT FROM URLSTAT WHERE LENGTH(REFERER)>0 AND DATE>='$_[0]' AND DATE<='$_[1]'",
-    #         );
-    #$SQL="SELECT DATE_FORMAT(DATE,\'%Y-%m-%d\') AS FDATE, $RANGE{$_[2]} GROUP BY FDATE";
-    $SQL="SELECT MONTH(DATE),SUM(ANSWER),COUNT(ANSWER) FROM POSTSTAT GROUP BY MONTH(DATE)";
-    $sth=$dbh->prepare($SQL);#print $SQL;
+    my %SQL_SRC=('Loyalty'=>"SELECT MONTH(DATE),SUM(ANSWER),COUNT(ANSWER) FROM POSTSTAT GROUP BY MONTH(DATE)",
+                 'Clickability'=>"SELECT MONTH(DATE), COUNT(URL), COUNT(REFERER) FROM URLSTAT WHERE LENGTH(REFERER)>0 GROUP BY MONTH(DATE)"
+                );
+    $sth=$dbh->prepare($SQL_SRC{$_[2]});#print $SQL_SRC{$_[2]};
     $sth->execute;
     print '<pre>';
     while ($ref=$sth->fetchrow_arrayref)
     {
         #print "$ref->[0]\t$ref->[1]\t$ref->[2]\n";
-        $sum=$sum."$ref->[1],";
-        $count=$count."$ref->[2],";
-        if(!$start_month)
+        $var1=$var1."$ref->[1],";
+        $var2=$var2."$ref->[2],";
+        if(!$start_month)#Устанавливаем начало и окончание периода для оси X
         {
             $start_month=$ref->[0];
         }
@@ -70,11 +71,14 @@ sub BuildChart()
             $finish_month=$ref->[0];
         }
     }
-    chop $sum;
-    chop $count;
+    chop $var1;
+    chop $var2;
+    #Заполнение графиков данными
+    my %IMG_SRC=('Loyalty'=>"<img src=\"http://chart.apis.google.com/chart?chxr=2,$start_month,$finish_month&chxt=y,r,x&chbh=a,7&chs=500x325&cht=bvg&chco=A2C180,3D7930&chd=t:$var1|$var2&chg=5,5,0,0&chtt=Loyalty\" width=\"500\" height=\"325\" alt=\"Loyalty\" />",
+                 'Clickability'=>"<img src=\"http://chart.apis.google.com/chart?chxr=0,0,5000|1,$start_month,$finish_month&chxt=y,x&chs=500x325&cht=lc&chco=A2C180&chds=0,5000&chd=t:$var1&chg=5,5,0,0&chls=3&chtt=Clickability\" width=\"500\" height=\"325\" alt=\"Clickability\" />"
+                );
     print '</pre><center>';
-    print "<img src=\"http://chart.apis.google.com/chart?chxr=2,$start_month,$finish_month&chxt=y,r,x&chbh=a,7&chs=500x325&cht=bvg&chco=A2C180,3D7930&chd=t:$sum|$count&chg=5,5,0,0&chtt=Vertical+bar+chart\" width=\"500\" height=\"325\" alt=\"Vertical bar chart\" />";
-    #print "<img src=\"http://chart.apis.google.com/chart?chxr=2,$start_month,$finish_month&chxt=y,r,x&chbh=a,7&chs=500x325&cht=lc&chco=A2C180,3D7930&chd=t:$sum|$count&chg=5,5,0,0&chtt=Vertical+bar+chart\" width=\"500\" height=\"325\" alt=\"Vertical bar chart\" />";
+    print $IMG_SRC{$_[2]};
     print '</center>';
     return 1;
 }
