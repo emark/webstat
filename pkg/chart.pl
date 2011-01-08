@@ -2,7 +2,7 @@
 #Create with http://imagecharteditor.appspot.com/
 package Chart;
 use strict;
-use constant VERSION=>0.2;
+use constant VERSION=>0.3;
 
 #Database description
 my $dbh=undef;
@@ -51,15 +51,14 @@ sub BuildChart()
     my $var2='';
     my $start_month='';
     my $finish_month='';
-    my %SQL_SRC=('Loyalty'=>"SELECT MONTH(DATE),SUM(ANSWER),COUNT(ANSWER) FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]' GROUP BY MONTH(DATE)",
-                 'Clickability'=>"SELECT MONTH(DATE), COUNT(URL), COUNT(REFERER) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY MONTH(DATE)"
+    my %SQL_SRC=('Loyalty'=>"SELECT MONTH(DATE),SUM(ANSWER),COUNT(ANSWER) FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]' GROUP BY MONTH(DATE) ORDER BY DATE",
+                 'Clickability'=>"SELECT MONTH(DATE), COUNT(URL), COUNT(REFERER) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY MONTH(DATE) ORDER BY DATE"
                 );
     $sth=$dbh->prepare($SQL_SRC{$_[2]});#print $SQL_SRC{$_[2]};
     $sth->execute;
-    print '<pre>';
     while ($ref=$sth->fetchrow_arrayref)
     {
-        #print "$ref->[0]\t$ref->[1]\t$ref->[2]\n";
+        #print "<pre>$ref->[0]\t$ref->[1]\t$ref->[2]\n</pre>"; Display data
         $var1=$var1."$ref->[1],";
         $var2=$var2."$ref->[2],";
         if(!$start_month)#Устанавливаем начало и окончание периода для оси X
@@ -74,11 +73,16 @@ sub BuildChart()
     chop $var1;
     chop $var2;
     #Заполнение графиков данными
-    my %IMG_SRC=('Loyalty'=>"<img src=\"http://chart.apis.google.com/chart?chxr=2,$start_month,$finish_month&chxt=y,r,x&chbh=a,7&chs=500x325&cht=bvg&chco=A2C180,3D7930&chd=t:$var1|$var2&chg=5,5,0,0&chtt=Data+for+Loyalty\" width=\"500\" height=\"325\" alt=\"Loyalty\" />",
-                 'Clickability'=>"<img src=\"http://chart.apis.google.com/chart?chxr=0,0,5000|1,$start_month,$finish_month&chxt=y,x&chs=500x325&cht=lc&chco=A2C180&chds=0,5000&chd=t:$var1&chg=5,5,0,0&chls=3&chm=o,008000,0,0:12:1,5&chtt=Data+for+Clickability\" width=\"500\" height=\"325\" alt=\"Clickability\" />"
+    my %IMG_SRC=('Loyalty'=>"http://chart.apis.google.com/chart?chxr=2,$start_month,$finish_month&chxt=y,r,x&chbh=a,7&chs=500x325&cht=bvg&chco=A2C180,3D7930&chd=t:$var1|$var2&chg=5,5,0,0&chtt=Data+for+Loyalty\" width=\"500\" height=\"325\" alt=\"Loyalty\"",
+                 'Clickability'=>"http://chart.apis.google.com/chart?chxr=0,0,5000|1,$start_month,$finish_month&chxt=y,x&chs=500x325&cht=lc&chco=A2C180&chds=0,5000&chd=t:$var1&chg=5,5,0,0&chls=3&chm=o,008000,0,0:12:1,5&chtt=Data+for+Clickability\" width=\"500\" height=\"325\" alt=\"Clickability\""
                 );
-    print '</pre><center>';
+    print '<center>Warning: use only complete year period!<br>';
+    print '<img src="';
     print $IMG_SRC{$_[2]};
+    print '"/>';
+    print '<P ALIGN=center><a href="';
+    print $IMG_SRC{$_[2]};
+    print '" target=_blank>Open chart</a></P>';
     print '</center>';
     return 1;
 }
