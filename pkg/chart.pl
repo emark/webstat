@@ -74,7 +74,7 @@ sub BuildChart()
     chop $var2;
     #Заполнение графиков данными
     my %IMG_SRC=('Loyalty'=>"http://chart.apis.google.com/chart?chxr=2,$start_month,$finish_month&chxt=y,r,x&chbh=a,7&chs=500x325&cht=bvg&chco=A2C180,3D7930&chd=t:$var1|$var2&chg=5,5,0,0&chtt=Data+for+Loyalty\" width=\"500\" height=\"325\" alt=\"Loyalty\"",
-                 'Clickability'=>"http://chart.apis.google.com/chart?chxr=0,0,5500|1,$start_month,$finish_month&chxt=y,x&chs=500x325&cht=lc&chco=A2C180&chds=0,5000&chd=t:$var1&chg=5,5,0,0&chls=3&chm=o,008000,0,0:12:1,5&chtt=Data+for+Clickability\" width=\"500\" height=\"325\" alt=\"Clickability\""
+                 'Clickability'=>"http://chart.apis.google.com/chart?chxr=0,0,6000|1,$start_month,$finish_month&chxt=y,x&chs=500x325&cht=lc&chco=A2C180&chds=0,6000&chd=t:$var1&chg=5,5,0,0&chls=3&chm=o,008000,0,0:12:1,5&chtt=Data+for+Clickability\" width=\"500\" height=\"325\" alt=\"Clickability\""
                 );
     print '<center>Warning: use only complete year period!<br>';
     print '<img src="';
