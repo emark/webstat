@@ -2,7 +2,7 @@
 #Create with http://imagecharteditor.appspot.com/
 package Chart;
 use strict;
-use constant VERSION=>0.3;
+use constant VERSION=>0.4;
 
 #Database description
 my $dbh=undef;
@@ -51,14 +51,14 @@ sub BuildChart()
     my $var2='';
     my $start_month='';
     my $finish_month='';
-    my %SQL_SRC=('Loyalty'=>"SELECT MONTH(DATE),SUM(ANSWER),COUNT(ANSWER) FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]' GROUP BY MONTH(DATE) ORDER BY DATE",
+    my %SQL_SRC=('Loyalty'=>"SELECT MONTH(DATE),SUM(IF(ANSWER>0,1,0)),COUNT(ANSWER) FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]' GROUP BY MONTH(DATE) ORDER BY DATE",
                  'Clickability'=>"SELECT MONTH(DATE), COUNT(URL), COUNT(REFERER) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY MONTH(DATE) ORDER BY DATE"
                 );
     $sth=$dbh->prepare($SQL_SRC{$_[2]});#print $SQL_SRC{$_[2]};
     $sth->execute;
     while ($ref=$sth->fetchrow_arrayref)
     {
-        #print "<pre>$ref->[0]\t$ref->[1]\t$ref->[2]\n</pre>"; Display data
+        #print "<pre>$ref->[0]\t$ref->[1]\t$ref->[2]\n</pre>"; #Display data
         $var1=$var1."$ref->[1],";
         $var2=$var2."$ref->[2],";
         if(!$start_month)#Устанавливаем начало и окончание периода для оси X

@@ -49,7 +49,10 @@ sub QueryTopList()
         {
             $n++;
             $bgcolor=&Syspkg::Rowcolor($n);
-            $totalsum=$totalsum+$ref->{'SUM'};
+            if($ref->{'SUM'}>0)#Учитываем только положительные голоса
+            {
+                $totalsum=$totalsum+$ref->{'SUM'};
+            }
             $totalcount=$totalcount+$ref->{'COUNT'};
             $ref->{'URL'}=~/(\/\d+\/\d+\/.*\/)/;
              if($n<=$rowlimit || $_[2])
