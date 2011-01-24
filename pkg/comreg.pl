@@ -63,8 +63,8 @@ sub CheckURLForm()
 #CompanyForm(%hash)
 sub CompanyForm()
 {
-    print @modoption;
-    print start_form(-method=>'get');
+    #print @modoption;
+    print start_form(-method=>'post');
     print hidden(-name=>'modoption',
                  -value=>"$_[0]->{'URL'}");
     print '<table border=0>';
@@ -171,10 +171,11 @@ sub SaveCompanyForm()
         VALUES('$_[0]','$_[2]','$_[3]','$_[4]','$_[5]','$_[6]',$_[7],$_[8],$_[9],$_[10],$_[11],$_[12],$_[13],NOW(),$_[15],$_[16],$_[17],$_[18],$_[19],$_[20],$_[21],$_[22],
         $_[23],$_[24],$_[25])";
     }
-    print $SQL;
+    #print $SQL;
     $sth=$dbh->prepare($SQL);
     $sth->execute();
-    print "<PRE>URL: $_[0] saved</PRE>";
+    print p({-align=>'center'},"Registry information about $_[2] ($_[0]) is saved.");
+    print p({-align=>'center'},"Would you like to <a href=\"?module=$module&modoption=$_[0]\">see</a> it or <a href=\"?module=$module\">check</a> another url?");
     return 1;
 }
 
@@ -187,7 +188,7 @@ sub CheckURL()
     $sth->execute();
     $SQL="SELECT `ID`, `ORGANIZATION`, `URL`, `OGRN`, `CONSPROP`, `ADDRESS`, `FNAME`, `PRICEINFO`, `DELIVERYINFO`, `GUARANTEE`, `ACCEPT`, `CASHBACK`,`GOODBACKDAYS`,
     `SYSDATE`, `EMAIL`, `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP` FROM COMPANYREF WHERE URL='$_[0]'";
-    $sth=$dbh->prepare($SQL);
+    $sth=$dbh->prepare($SQL);#print $SQL;
     $sth->execute();
     print "<PRE>Checked: $status[$sth->rows]</PRE>";
     return &CompanyForm($sth->fetchrow_hashref);
