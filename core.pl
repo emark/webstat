@@ -14,7 +14,7 @@ my @modules=(require 'pkg/loyalty.pl',
 
 my $query=new CGI;
 my $module=param('module');
-my $modoption=param('modoption');#Module option parameters
+my @modoption=param('modoption');#Module option parameters
 &Datecal::GetDates($query->param('date_in'),
                     $query->param('date_out')
                     );
@@ -67,22 +67,22 @@ sub StartModule()#Starting selected module
     print "<P align=center class=caption>Module: $module</P>";
     if($module eq $modules[0])
     {
-        &Loyalty::Init(Datecal::Period(),$modoption);    
+        &Loyalty::Init(Datecal::Period(),@modoption);    
     }
     elsif($module eq $modules[1])
     {
-        &Clickability::Init(Datecal::Period(),$modoption);    
+        &Clickability::Init(Datecal::Period(),@modoption);    
     }
     elsif($module eq $modules[2])
     {
-        &Chart::Init(Datecal::Period(),$modoption);    
+        &Chart::Init(Datecal::Period(),@modoption);    
     }
     elsif($module eq $modules[3])
     {
-        &ComReg::Init(Datecal::Period(),$modoption);
+        &ComReg::Init(@modoption);
     }
     else#Default module
     {
-        &Loyalty::Init(Datecal::Period(),$modoption);
+        &Loyalty::Init(Datecal::Period(),@modoption);
     }
 }

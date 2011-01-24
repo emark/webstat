@@ -10,26 +10,34 @@ my $sth=undef;
 my $ref=undef;
 my $SQL='';
 my $module='Registry';
-my $modoption='';
+my @modoption='';
 
 BEGIN;
 
 #Процедура инициализации модуля
-#USAGE: $date_in,$date_out,$modoption(url,expand)
+#USAGE: $date_in,$date_out,$modoption(url)
 #EXP: URL, REFERER
 sub Init()
 {
-    print @_;
-    my @modoption=('','');
-    if($_[2])
-    {
-        @modoption=split (/:/,$_[2]);
-        $modoption=$_[2];#Определяем глобальную переменную    
-    }  
+    #print @_;
+    #my @modoption=('','');
+    #if($_[2])
+    #{
+        #@modoption=split (/:/,$_[2]);
+        #$modoption=@_;#Определяем глобальную переменную    
+    #}  
     #Connection with database
+    @modoption=@_;
     $dbh=DBI->connect(&Syspkg::DBconf);
     $dbh->trace();
-    &CheckURLForm($modoption[0]);
+    if(@modoption<=1)
+    {
+        &CheckURLForm($modoption[0]);
+    }
+    else
+    {
+        &SaveCompanyForm(@modoption)
+    }
     &Disconnect;
 }
 
@@ -55,53 +63,119 @@ sub CheckURLForm()
 #CompanyForm(%hash)
 sub CompanyForm()
 {
-    my @checked=('','checked');
+    print @modoption;
     print start_form(-method=>'get');
     print hidden(-name=>'modoption',
                  -value=>"$_[0]->{'URL'}");
     print '<table border=0>';
     print '<tr><td rowspan=2>';
-    print p("ID: $_[0]->{'ID'}");
+    #print p("ID: $_[0]->{'ID'}");
+    print "<input type=hidden name=modoption value=$_[0]->{'ID'}>";
     print "<input type=text name=modoption value='$_[0]->{'ORGANIZATION'}'>&nbsp;Наименование магазина<br/>";
     print "<input type=text name=modoption value='$_[0]->{'OGRN'}'>&nbsp;ОГРН<br/>";
     print "<input type=text size=35 name=modoption value='$_[0]->{'ADDRESS'}'>&nbsp;Адрес продавца<br/>";
     print "<input type=text size=35 name=modoption value='$_[0]->{'FNAME'}'>&nbsp;Полное фирменное наименование<br/>";
     print "<input type=text name=modoption value='$_[0]->{'EMAIL'}'>&nbsp;Эл. почта<br/><hr width=100%>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'CONSPROP'}] value='$_[0]->{'CONSPROP'}' title='информация об основных потребительских свойствах товара'>&nbsp;Основные свойства товара<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'PRICEINFO'}] value='$_[0]->{'PRICEINFO'}' title='О цене и об условиях приобретения товара'>&nbsp;Цена и условия приобретения<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'DELIVERYINFO'}] value='$_[0]->{'DELIVERYINFO'}' title='Информация о его доставке'>&nbsp;Информация о доставке<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'GUARANTEE'}] value='$_[0]->{'GUARANTEE'}' title='Сроке службы, сроке годности и гарантийном сроке'>&nbsp;Гарантия, срок службы<br/>";
+    print &SelectHTML($_[0]->{'CONSPROP'}).'&nbsp;Основные свойства товара<br/>';
+    print &SelectHTML($_[0]->{'PRICEINFO'}).'&nbsp;Цена и условия приобретения<br/>';
+    print &SelectHTML($_[0]->{'DELIVERYINFO'}).'&nbsp;Информация о доставке<br/>';
+    print &SelectHTML($_[0]->{'GUARANTEE'}).'&nbsp;Гарантия, срок службы<br/>';
     print "<input type=text size=4 name=modoption value='$_[0]->{'ACCEPT'}' title='Срок, в течение которого действует предложение о заключении договора.'>&nbsp;Срок акцепта<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'CASHBACK'}] value='$_[0]->{'CASHBACK'}' title='Информация о порядке и сроках возврата товара надлежащего качества'>&nbsp;Срок и порядок возврата (надл. кач.)<br/>";
+    print &SelectHTML($_[0]->{'CASHBACK'}).'&nbsp;Срок и порядок возврата (надл. кач.)<br/>';
     print "<input type=text size=4 name=modoption value='$_[0]->{'GOODBACKDAYS'}' title='Срок возврата тов. надл.кач.'>&nbsp;Срок возврата товара<br/>";
+    print "<input type=hidden name=modoption value=$_[0]->{'SYSDATE'}>";
     print p("Дата регистрации (изменения): $_[0]->{'SYSDATE'}");
     print '</td><td>';
     print p('Информация о доставке');
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'DT_MAIL'}] value='$_[0]->{'DT_MAIL'}'>&nbsp;Почта РФ<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'DT_CC'}] value='$_[0]->{'DT_CC'}'>&nbsp;Курьерские компании<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'DT_TC'}] value='$_[0]->{'DT_TC'}'>&nbsp;Транспортные компании<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'DT_CR'}] value='$_[0]->{'DT_CR'}'>&nbsp;Курьер<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'DT_PP'}] value='$_[0]->{'DT_PP'}'>&nbsp;Самовывоз<br/>";
+    print &SelectHTML($_[0]->{'DT_MAIL'}).'&nbsp;Почта РФ<br/>';
+    print &SelectHTML($_[0]->{'DT_CC'}).'&nbsp;Курьерские компании<br/>';
+    print &SelectHTML($_[0]->{'DT_TC'}).'&nbsp;Транспортные компании<br/>';
+    print &SelectHTML($_[0]->{'DT_CR'}).'&nbsp;Курьер<br/>';
+    print &SelectHTML($_[0]->{'DT_PP'}).'&nbsp;Самовывоз<br/>';
     print '</td></tr><tr><td>';
     print p('Информация об оплате');
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'PT_BP'}] value='$_[0]->{'PT_BP'}'>&nbsp;Банковский платеж<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'PT_EM'}] value='$_[0]->{'PT_EM'}'>&nbsp;Электронные деньги<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'PT_CH'}] value='$_[0]->{'PT_CH'}'>&nbsp;Платеж наличными<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'PT_PM'}] value='$_[0]->{'PT_PM'}'>&nbsp;Наложенный платеж<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'PT_BC'}] value='$_[0]->{'PT_BC'}'>&nbsp;Банковские карты<br/>";
-    print "<input type=checkbox name=modoption $checked[$_[0]->{'PT_TP'}] value='$_[0]->{'PT_TP'}'>&nbsp;Терминалы оплаты<br/>";
+    print &SelectHTML($_[0]->{'PT_BP'}).'&nbsp;Банковский платеж<br/>';
+    print &SelectHTML($_[0]->{'PT_EM'}).'&nbsp;Электронные деньги<br/>';
+    print &SelectHTML($_[0]->{'PT_CH'}).'&nbsp;Платеж наличными<br/>';
+    print &SelectHTML($_[0]->{'PT_PM'}).'&nbsp;Наложенный платеж<br/>';
+    print &SelectHTML($_[0]->{'PT_BC'}).'&nbsp;Банковские карты<br/>';
+    print &SelectHTML($_[0]->{'PT_TP'}).'&nbsp;Терминалы оплаты<br/>';
     print '</td></tr><tr><td colspan=2 align=center>';
     print submit(-value=>'Save changes');
     print '</td></tr></table>';
     print hidden(-name=>'module',
-                 -value=>'Registry');
+                 -value=>$module);
     print end_form;
+}
+
+#Процедура печати HTML тега SELECT
+sub SelectHTML()
+{
+    my @selected=('false','selected');
+    my $select="<select name=modoption><option value='0' $selected[$_[0]]>&nbsp;&nbsp;X&nbsp;&nbsp;<option value='1' $selected[$_[0]]>&nbsp;&nbsp;V&nbsp;&nbsp;</select>";
+    return $select;
 }
 
 #Процедура сохранения данных регистрационной формы
 sub SaveCompanyForm()
 {
+    my @companyreg=@_;
+    my $n=0;
+    print "\n<!--Developer mode\n";
+    foreach my $key(@companyreg)
+    {
+        print "$n\t$key\t\n";
+        $n++
+    }
+    my $count=@_;
+    print $n;
+    print $count.'-->';
     
+    $SQL="SET NAMES UTF8";
+    $sth=$dbh->prepare($SQL);
+    $sth->execute();
+    
+    if($_[1])#ID существует
+    {
+        $SQL="UPDATE COMPANYREF
+        SET `ORGANIZATION`='$_[2]',
+         `OGRN`='$_[3]',
+         `ADDRESS`='$_[4]',
+         `FNAME`='$_[5]',
+         `EMAIL`='$_[6]',
+         `CONSPROP`=$_[7],
+         `PRICEINFO`=$_[8],
+         `DELIVERYINFO`=$_[9],
+         `GUARANTEE`=$_[10],
+         `ACCEPT`=$_[11],
+         `CASHBACK`=$_[12],
+          `GOODBACKDAYS`=$_[13],
+         `SYSDATE`='$_[14]',
+         `DT_MAIL`=$_[15],
+         `DT_CC`=$_[16],
+         `DT_TC`=$_[17],
+          `DT_CR`=$_[18],
+          `DT_PP`=$_[19],
+          `PT_BP`=$_[20],
+          `PT_EM`=$_[21],
+          `PT_CH`=$_[22],
+          `PT_PM`=$_[23],
+          `PT_BC`=$_[24],
+          `PT_TP`=$_[25] 
+        WHERE ID=$_[1]";
+    }
+    else
+    {
+        $SQL="INSERT INTO COMPANYREF(`URL`,`ORGANIZATION`, `OGRN`,`ADDRESS`, `FNAME`,`EMAIL`,`CONSPROP`, `PRICEINFO`, `DELIVERYINFO`, `GUARANTEE`, `ACCEPT`, `CASHBACK`,
+        `GOODBACKDAYS`,`SYSDATE`,  `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP`)
+        VALUES('$_[0]','$_[2]','$_[3]','$_[4]','$_[5]','$_[6]',$_[7],$_[8],$_[9],$_[10],$_[11],$_[12],$_[13],NOW(),$_[15],$_[16],$_[17],$_[18],$_[19],$_[20],$_[21],$_[22],
+        $_[23],$_[24],$_[25])";
+    }
+    print $SQL;
+    $sth=$dbh->prepare($SQL);
+    $sth->execute();
+    print "<PRE>URL: $_[0] saved</PRE>";
+    return 1;
 }
 
 #Процедура проверка существования URL
@@ -111,8 +185,8 @@ sub CheckURL()
     $SQL="SET NAMES UTF8";
     $sth=$dbh->prepare($SQL);
     $sth->execute();
-    $SQL="SELECT `ID`, `ORGANIZATION`, `URL`, `OGRN`, `CONSPROP`, `ADDRESS`, `FNAME`, `PRICEINFO`, `DELIVERYINFO`, `GUARANTEE`, `ACCEPT`, `CASHBACK`, `SYSDATE`,
-    `EMAIL`, `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP`, `GOODBACKDAYS` FROM COMPANYREF WHERE URL='$_[0]'";
+    $SQL="SELECT `ID`, `ORGANIZATION`, `URL`, `OGRN`, `CONSPROP`, `ADDRESS`, `FNAME`, `PRICEINFO`, `DELIVERYINFO`, `GUARANTEE`, `ACCEPT`, `CASHBACK`,`GOODBACKDAYS`,
+    `SYSDATE`, `EMAIL`, `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP` FROM COMPANYREF WHERE URL='$_[0]'";
     $sth=$dbh->prepare($SQL);
     $sth->execute();
     print "<PRE>Checked: $status[$sth->rows]</PRE>";
