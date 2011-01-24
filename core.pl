@@ -1,19 +1,20 @@
 #!/usr/bin/perl -w
 use strict;
 use DBI;
-use CGI;
+use CGI qw/:standard/;
 use constant VERSION=>1.2;
 require 'pkg/datecal.pl';
 require 'pkg/syspkg.pl';
 
 my @modules=(require 'pkg/loyalty.pl',
              require 'pkg/clickability.pl',
-             require 'pkg/chart.pl'
+             require 'pkg/chart.pl',
+             require 'pkg/comreg.pl',
              );
 
 my $query=new CGI;
-my $module=$query->param('module');
-my $modoption=$query->param('modoption');#Module option parameters
+my $module=param('module');
+my $modoption=param('modoption');#Module option parameters
 &Datecal::GetDates($query->param('date_in'),
                     $query->param('date_out')
                     );
@@ -22,11 +23,11 @@ my $modoption=$query->param('modoption');#Module option parameters
 
 sub HTMLDisplay()#Generate HTML headers & content
 {
-    print $query->header(-charset=>'UTF-8');
-    print $query->start_html(-title=>'Webstat',
+    print header(-charset=>'UTF-8');
+    print start_html(-title=>'Webstat',
                              -style=>'/stat/style.css'
                              );
-    print $query->start_form(-method=>'post',
+    print start_form(-method=>'post',
                              -action=>'?'
                              );
     print '<P class=presetdates>';
@@ -42,23 +43,23 @@ sub HTMLDisplay()#Generate HTML headers & content
         print ">$key</OPTION>";
     }
     print '</SELECT>&nbsp;';
-    print $query->submit();
+    print submit();
     print '</P><P align=center>';
     &Datecal::Rewind($module);
-    print $query->textfield(-name=>'date_in',
+    print textfield(-name=>'date_in',
                           -size=>12,
                           -value=>&Datecal::DateIn,
                           -maxlength=>10);
     print '&nbsp;-&nbsp;';
-    print $query->textfield(-name=>'date_out',
+    print textfield(-name=>'date_out',
                           -size=>12,
                           -value=>&Datecal::DateOut,
                           -maxlength=>10);
     &Datecal::Forward($module);
-    print $query->end_form;
+    print end_form;
     print '</P>';
     &StartModule;
-    print $query->end_html;
+    print end_html;
 }
 
 sub StartModule()#Starting selected module
@@ -75,6 +76,10 @@ sub StartModule()#Starting selected module
     elsif($module eq $modules[2])
     {
         &Chart::Init(Datecal::Period(),$modoption);    
+    }
+    elsif($module eq $modules[3])
+    {
+        &ComReg::Init(Datecal::Period(),$modoption);
     }
     else#Default module
     {
