@@ -24,7 +24,7 @@ my @modoption=param('modoption');#Module option parameters
 sub HTMLDisplay()#Generate HTML headers & content
 {
     print header(-charset=>'UTF-8');
-    print start_html(-title=>'Webstat',
+    print start_html(-title=>'Webstat '.VERSION,
                              -style=>'/stat/style.css'
                              );
     print start_form(-method=>'post',

@@ -72,7 +72,12 @@ sub CompanyForm()
     #print p("ID: $_[0]->{'ID'}");
     print "<input type=hidden name=modoption value=$_[0]->{'ID'}>";
     print "<input type=text name=modoption value='$_[0]->{'ORGANIZATION'}'>&nbsp;Наименование магазина<br/>";
-    print "<input type=text name=modoption value='$_[0]->{'OGRN'}'>&nbsp;ОГРН<br/>";
+    print "<input type=text name=modoption value='$_[0]->{'OGRN'}'>&nbsp;ОГРН&nbsp;";
+    #if($_[0]->{'OGRN'})#Просмотр сведений на сайте ИФНС
+    #{
+        #print "<a href=\"http://egrul.nalog.ru/fns/\" target=_blank>Данные ИФНС</a>";
+    #}
+    print '<br/>';
     print "<input type=text size=35 name=modoption value='$_[0]->{'ADDRESS'}'>&nbsp;Адрес продавца<br/>";
     print "<input type=text size=35 name=modoption value='$_[0]->{'FNAME'}'>&nbsp;Полное фирменное наименование<br/>";
     print "<input type=text name=modoption value='$_[0]->{'EMAIL'}'>&nbsp;Эл. почта<br/><hr width=100%>";
@@ -150,7 +155,7 @@ sub SaveCompanyForm()
          `ACCEPT`=$_[11],
          `CASHBACK`=$_[12],
           `GOODBACKDAYS`=$_[13],
-         `SYSDATE`='$_[14]',
+         `SYSDATE`=NOW(),
          `DT_MAIL`=$_[15],
          `DT_CC`=$_[16],
          `DT_TC`=$_[17],
@@ -175,7 +180,7 @@ sub SaveCompanyForm()
     $sth=$dbh->prepare($SQL);
     $sth->execute();
     print p({-align=>'center'},"Registry information about $_[2] ($_[0]) is saved.");
-    print p({-align=>'center'},"Would you like to <a href=\"?module=$module&modoption=$_[0]\">see</a> it or <a href=\"?module=$module\">check</a> another url?");
+    print p({-align=>'center'},"Would you like to <a href=\"?module=$module&modoption=$_[0]\">see</a> it or <a href=\"?module=$module\">search</a> another url?");
     return 1;
 }
 
