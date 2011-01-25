@@ -19,6 +19,7 @@ BEGIN;
 #EXP: URL, REFERER
 sub Init()
 {
+    &main::HTMLDisplay;
     #pages - инициализация страниц модуля. alias=>MODULE_NAME
     my %pages=('Loyalty'=>'Loyalty',
                'Clickability'=>'Clickability',
@@ -94,6 +95,7 @@ sub Disconnect()
     $dbh->disconnect;
     $dbh=undef;
     print '<P class=sysmsg>Connection close</P>';
+    &main::HTMLfinish;
 }
 
 return $module;

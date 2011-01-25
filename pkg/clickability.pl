@@ -18,6 +18,7 @@ BEGIN;
 #EXP: URL, REFERER
 sub Init()
 {
+    &main::HTMLDisplay;
     #pages - хеш страниц модуля. alias=>MODULE_NAME
     my %pages=('Shop URL'=>'URL',
                'Posts'=>'REFERER',
@@ -91,6 +92,7 @@ sub Disconnect()
     $dbh->disconnect;
     $dbh=undef;
     print '<P class=sysmsg>Connection close</P>';
+    &main::HTMLfinish;
 }
 
 return $module;

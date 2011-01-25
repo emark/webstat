@@ -9,17 +9,16 @@ require 'pkg/syspkg.pl';
 my @modules=(require 'pkg/loyalty.pl',
              require 'pkg/clickability.pl',
              require 'pkg/chart.pl',
-             require 'pkg/comreg.pl',
+             require 'pkg/registry.pl',
              );
 
 my $query=new CGI;
 my $module=param('module');
 my @modoption=param('modoption');#Module option parameters
-&Datecal::GetDates($query->param('date_in'),
-                    $query->param('date_out')
+&Datecal::GetDates(param('date_in'),
+                    param('date_out')
                     );
-
-&HTMLDisplay;
+&StartModule;
 
 sub HTMLDisplay()#Generate HTML headers & content
 {
@@ -58,13 +57,16 @@ sub HTMLDisplay()#Generate HTML headers & content
     &Datecal::Forward($module);
     print end_form;
     print '</P>';
-    &StartModule;
+}
+
+sub HTMLfinish()
+{
     print end_html;
 }
 
 sub StartModule()#Starting selected module
 {
-    print "<P align=center class=caption>Module: $module</P>";
+    #print "<P align=center class=caption>Module: $module</P>";
     if($module eq $modules[0])
     {
         &Loyalty::Init(Datecal::Period(),@modoption);    
@@ -79,7 +81,7 @@ sub StartModule()#Starting selected module
     }
     elsif($module eq $modules[3])
     {
-        &ComReg::Init(@modoption);
+        &Registry::Init(@modoption);
     }
     else#Default module
     {

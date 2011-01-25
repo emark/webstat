@@ -15,6 +15,7 @@ BEGIN;
 
 sub Init()
 {
+    &main::HTMLDisplay;
     my @modoption=('','');
     if($_[2])
     {
@@ -83,6 +84,7 @@ sub Disconnect()
     $dbh->disconnect;
     $dbh=undef;
     print '<P class=sysmsg>Connection close</P>';
+    &main::HTMLfinish;
 }
 
 return $module;
