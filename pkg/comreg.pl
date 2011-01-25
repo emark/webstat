@@ -19,36 +19,68 @@ BEGIN;
 #EXP: URL, REFERER
 sub Init()
 {
-    #print @_;
-    #my @modoption=('','');
-    #if($_[2])
-    #{
-        #@modoption=split (/:/,$_[2]);
-        #$modoption=@_;#Определяем глобальную переменную    
-    #}  
+    @modoption=@_;#print @modoption;
+    my %pages=('check'=>'Check URL',
+               'export'=>'Export',
+               );
+    my %pagetitle=('check'=>'Check URL', #Отображение в заголовке текущего действия
+               'export'=>'Export',
+               'save'=>'Save changes'
+               );
+    print "<P align=center>";
+    foreach my $key(keys %pages)
+    {
+        print "<a href=\"?module=$module&modoption=$key\">$pages{$key}</a>&nbsp";
+    }
+    print "<br>--<i>$pagetitle{$modoption[0]}</i>--</P>";
+    
     #Connection with database
-    @modoption=@_;
     $dbh=DBI->connect(&Syspkg::DBconf);
     $dbh->trace();
-    if(@modoption<=1)
+    if($modoption[0] eq 'check')
     {
-        &CheckURLForm($modoption[0]);
+        &CheckURLForm($modoption[1]);
     }
-    else
+    elsif($modoption[0] eq 'save')
     {
         &SaveCompanyForm(@modoption)
     }
+     elsif($modoption[0] eq 'export')
+    {
+        &ExportCSV(@modoption)
+    }
     &Disconnect;
+}
+
+#Процедура экспорта данных реестра в формате CSV
+sub ExportCSV()
+{
+    $SQL="SET NAMES UTF8";
+    $sth=$dbh->prepare($SQL);
+    $sth->execute();
+
+    $SQL="SELECT ID,URL FROM COMPANYREF ORDER BY ID";
+    $sth=$dbh->prepare($SQL);
+    $sth->execute;
+    print start_form();
+    while ($ref=$sth->fetchrow_hashref)
+    {
+        print checkbox(-name=>'modoption',
+                       -value=>$ref->{'ID'},
+                       -label=>''
+                       );
+        print "$ref->{'URL'}<br/>";
+    }
+    print submit;
+    print end_form;
 }
 
 sub CheckURLForm()
 {
     print start_form(-method=>'post');
-    print textfield(-name=>'modoption',
-                    -size=>25,
-                    -value=>'',
-                    -default=>'www.'.$_[0]
-                    );
+    print hidden(-name=>'modoption',
+                 -value=>'check');
+    print "<input type=text name=modoption size=25 value='$_[0]'>";
     print submit(-value=>'Check');
     print hidden(-name=>'module',
                  -value=>$module);
@@ -65,8 +97,8 @@ sub CompanyForm()
 {
     #print @modoption;
     print start_form(-method=>'post');
-    print hidden(-name=>'modoption',
-                 -value=>"$_[0]->{'URL'}");
+    print '<input type=hidden value=save name=modoption>';
+    print "<input type=hidden value=$_[0]->{'URL'} name=modoption>";
     print '<table border=0>';
     print '<tr><td rowspan=2>';
     #print p("ID: $_[0]->{'ID'}");
@@ -143,44 +175,44 @@ sub SaveCompanyForm()
     if($_[1])#ID существует
     {
         $SQL="UPDATE COMPANYREF
-        SET `ORGANIZATION`='$_[2]',
-         `OGRN`='$_[3]',
-         `ADDRESS`='$_[4]',
-         `FNAME`='$_[5]',
-         `EMAIL`='$_[6]',
-         `CONSPROP`=$_[7],
-         `PRICEINFO`=$_[8],
-         `DELIVERYINFO`=$_[9],
-         `GUARANTEE`=$_[10],
-         `ACCEPT`=$_[11],
-         `CASHBACK`=$_[12],
-          `GOODBACKDAYS`=$_[13],
+        SET `ORGANIZATION`='$_[3]',
+         `OGRN`='$_[4]',
+         `ADDRESS`='$_[5]',
+         `FNAME`='$_[6]',
+         `EMAIL`='$_[7]',
+         `CONSPROP`=$_[8],
+         `PRICEINFO`=$_[9],
+         `DELIVERYINFO`=$_[10],
+         `GUARANTEE`=$_[11],
+         `ACCEPT`=$_[12],
+         `CASHBACK`=$_[13],
+          `GOODBACKDAYS`=$_[14],
          `SYSDATE`=NOW(),
-         `DT_MAIL`=$_[15],
-         `DT_CC`=$_[16],
-         `DT_TC`=$_[17],
-          `DT_CR`=$_[18],
-          `DT_PP`=$_[19],
-          `PT_BP`=$_[20],
-          `PT_EM`=$_[21],
-          `PT_CH`=$_[22],
-          `PT_PM`=$_[23],
-          `PT_BC`=$_[24],
-          `PT_TP`=$_[25] 
-        WHERE ID=$_[1]";
+         `DT_MAIL`=$_[16],
+         `DT_CC`=$_[17],
+         `DT_TC`=$_[18],
+          `DT_CR`=$_[19],
+          `DT_PP`=$_[20],
+          `PT_BP`=$_[21],
+          `PT_EM`=$_[22],
+          `PT_CH`=$_[23],
+          `PT_PM`=$_[24],
+          `PT_BC`=$_[25],
+          `PT_TP`=$_[26] 
+        WHERE ID=$_[2]";
     }
     else
     {
         $SQL="INSERT INTO COMPANYREF(`URL`,`ORGANIZATION`, `OGRN`,`ADDRESS`, `FNAME`,`EMAIL`,`CONSPROP`, `PRICEINFO`, `DELIVERYINFO`, `GUARANTEE`, `ACCEPT`, `CASHBACK`,
         `GOODBACKDAYS`,`SYSDATE`,  `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP`)
-        VALUES('$_[0]','$_[2]','$_[3]','$_[4]','$_[5]','$_[6]',$_[7],$_[8],$_[9],$_[10],$_[11],$_[12],$_[13],NOW(),$_[15],$_[16],$_[17],$_[18],$_[19],$_[20],$_[21],$_[22],
-        $_[23],$_[24],$_[25])";
+        VALUES('$_[1]','$_[3]','$_[4]','$_[5]','$_[6]','$_[7]',$_[8],$_[9],$_[10],$_[11],$_[12],$_[13],$_[14],NOW(),$_[16],$_[17],$_[18],$_[19],$_[20],$_[21],$_[22],$_[23],
+        $_[24],$_[25],$_[26])";
     }
     #print $SQL;
     $sth=$dbh->prepare($SQL);
     $sth->execute();
-    print p({-align=>'center'},"Registry information about $_[2] ($_[0]) is saved.");
-    print p({-align=>'center'},"Would you like to <a href=\"?module=$module&modoption=$_[0]\">see</a> it or <a href=\"?module=$module\">search</a> another url?");
+    print p({-align=>'center'},"Registry information about $_[3] ($_[1]) is saved.");
+    print p({-align=>'center'},"Would you like to <a href=\"?module=$module&modoption=check&modoption=$_[1]\">see</a> it or <a href=\"?module=$module\">search</a> another url?");
     return 1;
 }
 
