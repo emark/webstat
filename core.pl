@@ -26,9 +26,10 @@ sub HTMLDisplay()#Generate HTML headers & content
     print start_html(-title=>'Webstat '.VERSION,
                              -style=>'/stat/style.css'
                              );
-    print start_form(-method=>'post',
-                             -action=>'?'
-                             );
+    print start_form(-name=>'DatePeriod',
+                     -method=>'post',
+                     -action=>'?'
+                     );
     print '<P class=presetdates>';
     &Datecal::PresetDates($module);
     print '</P><P><SELECT ID=module NAME=module>';

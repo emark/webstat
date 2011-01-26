@@ -30,7 +30,7 @@ sub Init()
     else
     {
         &main::HTMLDisplay;
-        print @modoption;
+        print @modoption; #Developer mode
         my %pages=('check'=>'Check URL',
                    'export'=>'Export',
                    );
@@ -117,9 +117,9 @@ sub ExportCSV()
 
 sub CheckURLForm()
 {
-    print start_form(-method=>'post');
-    print hidden(-name=>'modoption',
-                 -value=>'check');
+    print start_form(-name=>'CheckURL',
+                     -method=>'post');
+    print '<input type=hidden name=modoption value=check>';
     print "<input type=text name=modoption size=25 value='$_[0]'>";
     print submit(-value=>'Check');
     print hidden(-name=>'module',
@@ -136,7 +136,8 @@ sub CheckURLForm()
 sub CompanyForm()
 {
     #print @modoption;
-    print start_form(-method=>'post');
+    print start_form(-name=>'CompanyForm',
+                     -method=>'post');
     print '<input type=hidden value=save name=modoption>';
     print "<input type=hidden value=$_[0]->{'URL'} name=modoption>";
     print '<table border=0>';
@@ -265,7 +266,7 @@ sub CheckURL()
     $sth->execute();
     $SQL="SELECT `ID`, `ORGANIZATION`, `URL`, `OGRN`, `CONSPROP`, `ADDRESS`, `FNAME`, `PRICEINFO`, `DELIVERYINFO`, `GUARANTEE`, `ACCEPT`, `CASHBACK`,`GOODBACKDAYS`,
     `SYSDATE`, `EMAIL`, `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP` FROM COMPANYREF WHERE URL='$_[0]'";
-    $sth=$dbh->prepare($SQL);#print $SQL;
+    $sth=$dbh->prepare($SQL);print $SQL;
     $sth->execute();
     print "<PRE>Checked: $status[$sth->rows]</PRE>";
     return &CompanyForm($sth->fetchrow_hashref);
