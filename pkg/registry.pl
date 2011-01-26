@@ -110,7 +110,7 @@ sub ExportCSV()
         $sth->execute;#print $SQL;
         while ($ref=$sth->fetchrow_hashref)
         {
-            print "<a href=\"http://www.web2buy.ru/link/?url=$ref->{'URL'}\">$ref->{'URL'}</a>;<a href=\"\">Подробнее</a>;\n";
+            print "<a href=\"http://www.web2buy.ru/link/?url=$ref->{'URL'}\">$ref->{'URL'}</a>;<a href=\"temp/?$ref->{'URL'}\">Подробнее</a>;\n";
         }
     }
 }
