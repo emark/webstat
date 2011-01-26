@@ -2,7 +2,7 @@
 package Registry;
 use strict;
 use CGI qw/:standard/;
-use constant VERSION=>0.1;
+use constant VERSION=>0.2;
 
 #Database description
 my $dbh=undef;
@@ -19,7 +19,7 @@ BEGIN;
 #EXP: URL, REFERER
 sub Init()
 {
-    @modoption=@_;#print @modoption;
+    @modoption=@_;
     if($modoption[0] eq 'export' && @modoption>1) #Если выбран хотя бы один элемент
     {
         print header(-charset=>'UTF-8',
@@ -29,7 +29,8 @@ sub Init()
     }
     else
     {
-        &main::HTMLDisplay;        
+        &main::HTMLDisplay;
+        print @modoption;
         my %pages=('check'=>'Check URL',
                    'export'=>'Export',
                    );
@@ -91,7 +92,7 @@ sub ExportCSV()
                            -value=>$ref->{'ID'},
                            -label=>''
                            );
-            print "$ref->{'URL'}<br/>";
+            print "<a href=\"?module=$module&modoption=check&modoption=$ref->{'URL'}\">$ref->{'URL'}</a><br/>";
         }
         print submit;
         print end_form;
