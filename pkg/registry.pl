@@ -35,7 +35,7 @@ sub Init()
                    'export'=>'Export',
                    );
         my %pagetitle=('check'=>'Check URL', #Отображение в заголовке текущего действия
-                   'export'=>'Export',
+                   'export'=>'CSV export',
                    'save'=>'Save changes'
                    );
         print "<P align=center>";
@@ -94,7 +94,7 @@ sub ExportCSV()
                            );
             print "<a href=\"?module=$module&modoption=check&modoption=$ref->{'URL'}\">$ref->{'URL'}</a><br/>";
         }
-        print submit;
+        print submit(-value=>'Export');
         print end_form;
     }
     else
@@ -108,9 +108,12 @@ sub ExportCSV()
         }
         $sth=$dbh->prepare($SQL);
         $sth->execute;#print $SQL;
+        my $pnum=0;
         while ($ref=$sth->fetchrow_hashref)
         {
-            print "<a href=\"http://www.web2buy.ru/link/?url=$ref->{'URL'}\">$ref->{'URL'}</a>;<a href=\"http://www.web2buy.ru/catalog/shopinfo/?url=$ref->{'URL'}\">Подробнее</a>;\n";
+            print "<a href=\"http://www.web2buy.ru/link/?url=$ref->{'URL'}\" title='Переход в интернет-магазин' target=_blank>$ref->{'URL'}</a>
+            <P id=\"shopinfo-$pnum\"><a href=\"#1\" onClick=\"javascript:ShopInfo('$ref->{'URL'}','shopinfo-$pnum');return true\" title='ОГРН, условия доставки, оплаты'>Подробнее</a></P>;\n";
+            $pnum++;
         }
     }
 }
