@@ -30,7 +30,7 @@ sub Init()
     else
     {
         &main::HTMLDisplay;
-        print @modoption; #Developer mode
+        #print @modoption; #Developer mode
         my %pages=('check'=>'Check URL',
                    'export'=>'Export',
                    );
@@ -253,7 +253,7 @@ sub SaveCompanyForm()
         VALUES('$_[1]','$_[3]','$_[4]','$_[5]','$_[6]','$_[7]',$_[8],$_[9],$_[10],$_[11],$_[12],$_[13],$_[14],NOW(),$_[16],$_[17],$_[18],$_[19],$_[20],$_[21],$_[22],$_[23],
         $_[24],$_[25],$_[26])";
     }
-    print $SQL;
+    #print $SQL;
     $sth=$dbh->prepare($SQL);
     $sth->execute();
     print p({-align=>'center'},"Registry information about $_[3] ($_[1]) is saved.");
