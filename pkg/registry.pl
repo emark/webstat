@@ -2,7 +2,7 @@
 package Registry;
 use strict;
 use CGI qw/:standard/;
-use constant VERSION=>0.2;
+use constant VERSION=>0.3;
 
 #Database description
 my $dbh=undef;
@@ -30,7 +30,7 @@ sub Init()
     else
     {
         &main::HTMLDisplay;
-        #print @modoption; #Developer mode
+        print @modoption; #Developer mode
         my %pages=('check'=>'Check URL',
                    'export'=>'Export',
                    );
@@ -139,48 +139,49 @@ sub CheckURLForm()
 sub CompanyForm()
 {
     #print @modoption;
+    my %companyreg=@_;
     print start_form(-name=>'CompanyForm',
                      -method=>'post');
     print '<input type=hidden value=save name=modoption>';
-    print "<input type=hidden value=$_[0]->{'URL'} name=modoption>";
+    print "<input type=hidden value='$companyreg{'URL'}' name=modoption>";
     print '<table border=0>';
     print '<tr><td rowspan=2>';
-    #print p("ID: $_[0]->{'ID'}");
-    print "<input type=hidden name=modoption value=$_[0]->{'ID'}>";
-    print "<input type=text name=modoption value='$_[0]->{'ORGANIZATION'}'>&nbsp;Наименование магазина<br/>";
-    print "<input type=text name=modoption value='$_[0]->{'OGRN'}'>&nbsp;ОГРН&nbsp;";
-    #if($_[0]->{'OGRN'})#Просмотр сведений на сайте ИФНС
+    #print p("ID: $companyreg{'ID'}");
+    print "<input type=hidden name=modoption value=$companyreg{'ID'}>";
+    print "<input type=text name=modoption value='$companyreg{'ORGANIZATION'}'>&nbsp;Наименование магазина<br/>";
+    print "<input type=text name=modoption value='$companyreg{'OGRN'}'>&nbsp;ОГРН&nbsp;";
+    #if($companyreg{'OGRN'})#Просмотр сведений на сайте ИФНС
     #{
         #print "<a href=\"http://egrul.nalog.ru/fns/\" target=_blank>Данные ИФНС</a>";
     #}
     print '<br/>';
-    print "<input type=text size=35 name=modoption value='$_[0]->{'ADDRESS'}'>&nbsp;Адрес продавца<br/>";
-    print "<input type=text size=35 name=modoption value='$_[0]->{'FNAME'}'>&nbsp;Полное фирменное наименование<br/>";
-    print "<input type=text name=modoption value='$_[0]->{'EMAIL'}'>&nbsp;Эл. почта<br/><hr width=100%>";
-    print &SelectHTML($_[0]->{'CONSPROP'}).'&nbsp;Основные свойства товара<br/>';
-    print &SelectHTML($_[0]->{'PRICEINFO'}).'&nbsp;Цена и условия приобретения<br/>';
-    print &SelectHTML($_[0]->{'DELIVERYINFO'}).'&nbsp;Информация о доставке<br/>';
-    print &SelectHTML($_[0]->{'GUARANTEE'}).'&nbsp;Гарантия, срок службы<br/>';
-    print "<input type=text size=4 name=modoption value='$_[0]->{'ACCEPT'}' title='Срок, в течение которого действует предложение о заключении договора.'>&nbsp;Срок акцепта<br/>";
-    print &SelectHTML($_[0]->{'CASHBACK'}).'&nbsp;Срок и порядок возврата (надл. кач.)<br/>';
-    print "<input type=text size=4 name=modoption value='$_[0]->{'GOODBACKDAYS'}' title='Срок возврата тов. надл.кач.'>&nbsp;Срок возврата товара<br/>";
-    print "<input type=hidden name=modoption value=$_[0]->{'SYSDATE'}>";
-    print p("Дата регистрации (изменения): $_[0]->{'SYSDATE'}");
+    print "<input type=text size=35 name=modoption value='$companyreg{'ADDRESS'}'>&nbsp;Адрес продавца<br/>";
+    print "<input type=text size=35 name=modoption value='$companyreg{'FNAME'}'>&nbsp;Полное фирменное наименование<br/>";
+    print "<input type=text name=modoption value='$companyreg{'EMAIL'}'>&nbsp;Эл. почта<br/><hr width=100%>";
+    print &SelectHTML($companyreg{'CONSPROP'}).'&nbsp;Основные свойства товара<br/>';
+    print &SelectHTML($companyreg{'PRICEINFO'}).'&nbsp;Цена и условия приобретения<br/>';
+    print &SelectHTML($companyreg{'DELIVERYINFO'}).'&nbsp;Информация о доставке<br/>';
+    print &SelectHTML($companyreg{'GUARANTEE'}).'&nbsp;Гарантия, срок службы<br/>';
+    print "<input type=text size=4 name=modoption value='$companyreg{'ACCEPT'}' title='Срок, в течение которого действует предложение о заключении договора.'>&nbsp;Срок акцепта<br/>";
+    print &SelectHTML($companyreg{'CASHBACK'}).'&nbsp;Срок и порядок возврата (надл. кач.)<br/>';
+    print "<input type=text size=4 name=modoption value='$companyreg{'GOODBACKDAYS'}' title='Срок возврата тов. надл.кач.'>&nbsp;Срок возврата товара<br/>";
+    print "<input type=hidden name=modoption value=$companyreg{'SYSDATE'}>";
+    print p("Дата регистрации (изменения): $companyreg{'SYSDATE'}");
     print '</td><td>';
     print p('Информация о доставке');
-    print &SelectHTML($_[0]->{'DT_MAIL'}).'&nbsp;Почта РФ<br/>';
-    print &SelectHTML($_[0]->{'DT_CC'}).'&nbsp;Курьерские компании<br/>';
-    print &SelectHTML($_[0]->{'DT_TC'}).'&nbsp;Транспортные компании<br/>';
-    print &SelectHTML($_[0]->{'DT_CR'}).'&nbsp;Курьер<br/>';
-    print &SelectHTML($_[0]->{'DT_PP'}).'&nbsp;Самовывоз<br/>';
+    print &SelectHTML($companyreg{'DT_MAIL'}).'&nbsp;Почта РФ<br/>';
+    print &SelectHTML($companyreg{'DT_CC'}).'&nbsp;Курьерские компании<br/>';
+    print &SelectHTML($companyreg{'DT_TC'}).'&nbsp;Транспортные компании<br/>';
+    print &SelectHTML($companyreg{'DT_CR'}).'&nbsp;Курьер<br/>';
+    print &SelectHTML($companyreg{'DT_PP'}).'&nbsp;Самовывоз<br/>';
     print '</td></tr><tr><td>';
     print p('Информация об оплате');
-    print &SelectHTML($_[0]->{'PT_BP'}).'&nbsp;Банковский платеж<br/>';
-    print &SelectHTML($_[0]->{'PT_EM'}).'&nbsp;Электронные деньги<br/>';
-    print &SelectHTML($_[0]->{'PT_CH'}).'&nbsp;Платеж наличными<br/>';
-    print &SelectHTML($_[0]->{'PT_PM'}).'&nbsp;Наложенный платеж<br/>';
-    print &SelectHTML($_[0]->{'PT_BC'}).'&nbsp;Банковские карты<br/>';
-    print &SelectHTML($_[0]->{'PT_TP'}).'&nbsp;Терминалы оплаты<br/>';
+    print &SelectHTML($companyreg{'PT_BP'}).'&nbsp;Банковский платеж<br/>';
+    print &SelectHTML($companyreg{'PT_EM'}).'&nbsp;Электронные деньги<br/>';
+    print &SelectHTML($companyreg{'PT_CH'}).'&nbsp;Платеж наличными<br/>';
+    print &SelectHTML($companyreg{'PT_PM'}).'&nbsp;Наложенный платеж<br/>';
+    print &SelectHTML($companyreg{'PT_BC'}).'&nbsp;Банковские карты<br/>';
+    print &SelectHTML($companyreg{'PT_TP'}).'&nbsp;Терминалы оплаты<br/>';
     print '</td></tr><tr><td colspan=2 align=center>';
     print submit(-value=>'Save changes');
     print '</td></tr></table>';
@@ -216,7 +217,7 @@ sub SaveCompanyForm()
     $sth=$dbh->prepare($SQL);
     $sth->execute();
     
-    if($_[1])#ID существует
+    if($_[2])#ID существует
     {
         $SQL="UPDATE COMPANYREF
         SET `ORGANIZATION`='$_[3]',
@@ -252,7 +253,7 @@ sub SaveCompanyForm()
         VALUES('$_[1]','$_[3]','$_[4]','$_[5]','$_[6]','$_[7]',$_[8],$_[9],$_[10],$_[11],$_[12],$_[13],$_[14],NOW(),$_[16],$_[17],$_[18],$_[19],$_[20],$_[21],$_[22],$_[23],
         $_[24],$_[25],$_[26])";
     }
-    #print $SQL;
+    print $SQL;
     $sth=$dbh->prepare($SQL);
     $sth->execute();
     print p({-align=>'center'},"Registry information about $_[3] ($_[1]) is saved.");
@@ -264,6 +265,7 @@ sub SaveCompanyForm()
 sub CheckURL()
 {
     my @status=('False','Ok');
+    my %companyreg=('URL'=>$_[0]);
     $SQL="SET NAMES UTF8";
     $sth=$dbh->prepare($SQL);
     $sth->execute();
@@ -272,7 +274,17 @@ sub CheckURL()
     $sth=$dbh->prepare($SQL);#print $SQL;
     $sth->execute();
     print "<PRE>Checked: $status[$sth->rows]</PRE>";
-    return &CompanyForm($sth->fetchrow_hashref);
+    if($sth->rows())
+    {
+        while($ref=$sth->fetchrow_hashref)
+        {
+            for(my $n=0;$n<=25;$n++)
+            {
+                $companyreg{$sth->{'NAME'}->[$n]}=$ref->{$sth->{'NAME'}->[$n]};
+            }
+        }
+    }
+    return &CompanyForm(%companyreg);
 }
 
 sub Disconnect()
