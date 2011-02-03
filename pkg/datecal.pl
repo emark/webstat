@@ -10,9 +10,6 @@ my $date_diff=undef;#Разница дней периода
 my $date_forward=undef;
 my $date_rewind=undef;
 
-#&GetDates('2010-10-01','2010-12-01');
-#&Forward;
-#&Rewind;
 BEGIN;
 
 #Процедура валидации и проверки временного интервала

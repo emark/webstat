@@ -256,7 +256,7 @@ sub SaveCompanyForm()
     $sth=$dbh->prepare($SQL);
     $sth->execute();
     print p({-align=>'center'},"Registry information about $_[3] ($_[1]) is saved.");
-    print p({-align=>'center'},"Would you like to <a href=\"?module=$module&modoption=check&modoption=$_[1]\">see</a> it or <a href=\"?module=$module\">search</a> another url?");
+    print p({-align=>'center'},"Would you like to <a href=\"?module=$module&modoption=check&modoption=$_[1]\">see</a> it or <a href=\"?module=$module&modoption=check\">search</a> another url?");
     return 1;
 }
 
