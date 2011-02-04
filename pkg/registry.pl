@@ -101,7 +101,7 @@ sub ExportCSV()
     {
         my @id=@_;
         shift @id;
-        $SQL="SELECT ID,URL FROM COMPANYREF WHERE ID=0 ";
+        $SQL="SELECT ID,URL,EMAIL FROM COMPANYREF WHERE ID=0 ";
         foreach my $key(@id)
         {
             $SQL=$SQL." OR ID=$key";
@@ -111,7 +111,7 @@ sub ExportCSV()
         my $pnum=0;
         while ($ref=$sth->fetchrow_hashref)
         {
-            print "<a href=\"http://www.web2buy.ru/link/?url=$ref->{'URL'}\" title='Переход в интернет-магазин' target=_blank>$ref->{'URL'}</a><P id=\"shopinfo-$pnum\"><a href=\"#1\" onClick=\"javascript:ShopInfo('$ref->{'URL'}','shopinfo-$pnum')\" title='ОГРН, условия доставки, оплаты'>Подробнее</a></P>;\n";
+            print "<a href=\"http://www.web2buy.ru/link/?url=$ref->{'URL'}\" title='Переход в интернет-магазин' target=_blank>$ref->{'URL'}</a><P id=\"shopinfo-$pnum\"><a href=\"#1\" onClick=\"javascript:ShopInfo('$ref->{'URL'}','shopinfo-$pnum')\" title='ОГРН, условия доставки, оплаты'>Подробнее</a></P>;$ref->{'URL'};$ref->{'EMAIL'}\n";
             $pnum++;
         }
     }
