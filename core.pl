@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 use DBI;
-use CGI qw/:standard/;
-use CGI::Carp;
+use CGI qw/:standard -debug/;
+use CGI::Carp 'fatalsToBrowser';
 use constant VERSION=>1.2;
 require 'pkg/datecal.pl';
 require 'pkg/syspkg.pl';
@@ -50,11 +50,13 @@ sub HTMLDisplay()#Generate HTML headers & content
     print textfield(-name=>'date_in',
                           -size=>12,
                           -value=>&Datecal::DateIn,
+                          -override=>1,
                           -maxlength=>10);
     print '&nbsp;-&nbsp;';
     print textfield(-name=>'date_out',
                           -size=>12,
                           -value=>&Datecal::DateOut,
+                          -override=>1,
                           -maxlength=>10);
     &Datecal::Forward($module);
     print end_form;

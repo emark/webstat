@@ -68,7 +68,7 @@ sub QueryTopList()
         }
         $percent=($totalsum/$totalcount)*100;
         $percent=int($percent);
-        print "<tr><td colspan=2 align=center><i>Total votes ($percent%)</i></td><td><b>$totalsum+</b></td><td><b>$totalcount</b></td></tr></table>\n";
+        print "<tr><td colspan=2 align=center><i>Total loyalty ($percent%)</i></td><td><b>$totalsum+</b></td><td><b>$totalcount</b></td></tr></table>\n";
     }
     else
     {
