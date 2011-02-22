@@ -2,6 +2,7 @@
 use strict;
 use DBI;
 use CGI qw/:standard/;
+use CGI::Carp;
 use constant VERSION=>1.2;
 require 'pkg/datecal.pl';
 require 'pkg/syspkg.pl';

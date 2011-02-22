@@ -2,7 +2,7 @@
 package Datecal;
 use strict;
 use DateTime;
-use constant VERSION=>1.01;
+use constant VERSION=>1.02;
 
 my $date_in=undef;
 my $date_out=undef;
@@ -32,20 +32,19 @@ sub GetDates()
                                 );
     }
     
-    if(!$_[1])
+    if(!$_[1] || $_[1] eq $_[0])
     {
-        $date_out=DateTime->now();
-        $date_out->add(days=>1);
+        $date_out=DateTime->new(year=>1,
+                                month=>1,
+                                day=>1,
+                                hour=>0,
+                                minute=>0);
+        $date_out=$date_in->clone->add(days=>1);
     }
     else
     {
         ($y,$m,$d)=split('-',$_[1]);
-        $date_out=DateTime->new(year=>$y,
-                                month=>$m,
-                                day=>$d,
-                                hour=>0,
-                                minute=>0
-                                );
+        $date_out=DateTime->now();
     }
     $date_diff=$date_out-$date_in;
     $date_forward=$date_out->clone->add($date_diff)->ymd;
