@@ -13,7 +13,7 @@ my @modules=(require 'pkg/loyalty.pl',
              );
 
 my $query=new CGI;
-my $module=param('module');
+my $module=param('module') || '';
 my @modoption=param('modoption');#Module option parameters
 &Datecal::GetDates(param('date_in'),
                     param('date_out')
@@ -67,7 +67,6 @@ sub HTMLfinish()
 
 sub StartModule()#Starting selected module
 {
-    #print "<P align=center class=caption>Module: $module</P>";
     if($module eq $modules[0])
     {
         &Loyalty::Init(Datecal::Period(),@modoption);    
