@@ -2,7 +2,7 @@
 #Create with http://imagecharteditor.appspot.com/
 package Chart;
 use strict;
-use constant VERSION=>0.4;
+use constant VERSION=>0.5;
 
 #Database description
 my $dbh=undef;
@@ -57,9 +57,10 @@ sub BuildChart()
                 );
     $sth=$dbh->prepare($SQL_SRC{$_[2]});#print $SQL_SRC{$_[2]};
     $sth->execute;
+    print "<pre>Month\tData1\tData2\n";
     while ($ref=$sth->fetchrow_arrayref)
     {
-        #print "<pre>$ref->[0]\t$ref->[1]\t$ref->[2]\n</pre>"; #Display data
+        print "$ref->[0]\t$ref->[1]\t$ref->[2]\n"; #Display data
         $var1=$var1."$ref->[1],";
         $var2=$var2."$ref->[2],";
         if(!$start_month)#Устанавливаем начало и окончание периода для оси X
@@ -77,7 +78,7 @@ sub BuildChart()
     my %IMG_SRC=('Loyalty'=>"http://chart.apis.google.com/chart?chxr=2,$start_month,$finish_month&chxt=y,r,x&chbh=a,7&chs=500x325&cht=bvg&chco=A2C180,3D7930&chd=t:$var1|$var2&chg=5,5,0,0&chtt=Data+for+Loyalty\" width=\"500\" height=\"325\" alt=\"Loyalty\"",
                  'Clickability'=>"http://chart.apis.google.com/chart?chxr=0,0,6000|1,$start_month,$finish_month&chxt=y,x&chs=500x325&cht=lc&chco=A2C180&chds=0,6000&chd=t:$var1&chg=5,5,0,0&chls=3&chm=o,008000,0,0:12:1,5&chtt=Data+for+Clickability\" width=\"500\" height=\"325\" alt=\"Clickability\""
                 );
-    print '<center>Warning: use only complete year period!<br>';
+    print '</pre><center>Warning: use only complete year period!<br>';
     print '<img src="';
     print $IMG_SRC{$_[2]};
     print '"/>';

@@ -6,7 +6,7 @@ BEGIN;
 sub DBconf()
 {
     my @production=('DBI:mysql:database=COMMON;host=localhost','service','RrFTkLX2');
-    my @develop=('DBI:mysql:database=COMMON;host=localhost','root','admin');
+    my @develop=('DBI:mysql:database=locumtes_web2b58;host=localhost','root','admin');
     return @develop;
 }
 
