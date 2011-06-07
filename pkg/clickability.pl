@@ -83,7 +83,7 @@ sub QueryClickability()
             $totalclicks=$totalclicks+$ref->{'CLICKABILITY'};
             if($n<=$rowlimit || $_[3])
             {
-                print "<tr bgcolor=$bgcolor><td>$n</td><td><a href=\"$domain{$_[2]}$ref->{$_[2]}\" target=_blank title='Open in new window'>$name</a>&nbsp;<a href=\"#1\" target=_self title='Expand post'>&#8594;</a></td><td>$ref->{'CLICKABILITY'}</td></tr>\n";
+                print "<tr bgcolor=$bgcolor><td>$n</td><td><a href=\"$domain{$_[2]}$ref->{$_[2]}\" target=_blank title='Open in new window'>$name</a>&nbsp;<a href=\"#1\" target=_self title='Expand post'>+</a></td><td>$ref->{'CLICKABILITY'}</td></tr>\n";
             }
         }
         if(!$_[3] && $n>$rowlimit)#Если строк меньше rowlimit, не показыаем тег more

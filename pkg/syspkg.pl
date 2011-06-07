@@ -5,9 +5,11 @@ BEGIN;
 
 sub DBconf()
 {
-    my @production=('DBI:mysql:database=COMMON;host=localhost','service','RrFTkLX2');
-    my @develop=('DBI:mysql:database=locumtes_web2b58;host=localhost','root','admin');
-    return @develop;
+    open (DBCONF,"< db.conf") || die "Error open dbconfig file";
+    my @dbconf=<DBCONF>;
+    close DBCONF;
+    chomp @dbconf;
+    return @dbconf;
 }
 
 #Подсветка таблицы "зеброй" в строках
