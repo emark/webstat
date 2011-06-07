@@ -181,7 +181,9 @@ sub CompanyForm()
     print &SelectHTML($companyreg{'PT_PM'}).'&nbsp;Наложенный платеж<br/>';
     print &SelectHTML($companyreg{'PT_BC'}).'&nbsp;Банковские карты<br/>';
     print &SelectHTML($companyreg{'PT_TP'}).'&nbsp;Терминалы оплаты<br/>';
-    print '</td></tr><tr><td colspan=2 align=center>';
+    print '</td></tr><tr><td colspan=2 align=left>';
+    print "<input type=text size=60 name=modoption value=\"$companyreg{'TAGS'}\">&nbsp;Метки магазина<br/>";
+    print '</td></tr><tr><td colspan=2 align=left>';
     print submit(-value=>'Save changes');
     print '</td></tr></table>';
     print hidden(-name=>'module',
@@ -242,15 +244,16 @@ sub SaveCompanyForm()
           `PT_CH`=$_[23],
           `PT_PM`=$_[24],
           `PT_BC`=$_[25],
-          `PT_TP`=$_[26] 
+          `PT_TP`=$_[26],
+          `TAGS`=\"$_[27]\" 
         WHERE ID=$_[2]";
     }
     else
     {
         $SQL="INSERT INTO COMPANYREF(`URL`,`ORGANIZATION`, `OGRN`,`ADDRESS`, `FNAME`,`EMAIL`,`CONSPROP`, `PRICEINFO`, `DELIVERYINFO`, `GUARANTEE`, `ACCEPT`, `CASHBACK`,
-        `GOODBACKDAYS`,`SYSDATE`,  `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP`)
+        `GOODBACKDAYS`,`SYSDATE`,  `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP`,`TAGS`)
         VALUES('$_[1]','$_[3]','$_[4]','$_[5]','$_[6]','$_[7]',$_[8],$_[9],$_[10],$_[11],$_[12],$_[13],$_[14],NOW(),$_[16],$_[17],$_[18],$_[19],$_[20],$_[21],$_[22],$_[23],
-        $_[24],$_[25],$_[26])";
+        $_[24],$_[25],$_[26],\"$_[27]\")";
     }
     #print $SQL;
     $sth=$dbh->prepare($SQL);
@@ -269,7 +272,7 @@ sub CheckURL()
     $sth=$dbh->prepare($SQL);
     $sth->execute();
     $SQL="SELECT `ID`, `ORGANIZATION`, `URL`, `OGRN`, `CONSPROP`, `ADDRESS`, `FNAME`, `PRICEINFO`, `DELIVERYINFO`, `GUARANTEE`, `ACCEPT`, `CASHBACK`,`GOODBACKDAYS`,
-    `SYSDATE`, `EMAIL`, `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP` FROM COMPANYREF WHERE URL='$_[0]'";
+    `SYSDATE`, `EMAIL`, `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP`, TAGS FROM COMPANYREF WHERE URL='$_[0]'";
     $sth=$dbh->prepare($SQL);#print $SQL;
     $sth->execute();
     print "<PRE>Checked: $status[$sth->rows]</PRE>";
@@ -277,7 +280,7 @@ sub CheckURL()
     {
         while($ref=$sth->fetchrow_hashref)
         {
-            for(my $n=0;$n<=25;$n++)
+            for(my $n=0;$n<=26;$n++)
             {
                 $companyreg{$sth->{'NAME'}->[$n]}=$ref->{$sth->{'NAME'}->[$n]};
             }
