@@ -28,7 +28,7 @@ sub Init()
     if($_[2])
     {
         @modoption=split (/:/,$_[2]);
-        $modoption=$_[2];#Определяем глобальную переменную    
+        $modoption=$_[2];#Определяем глобальную переменную
     }    
     $dbh=DBI->connect(&Syspkg::DBconf);
     $dbh->trace();
@@ -37,26 +37,15 @@ sub Init()
     {
         print "<a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$key\">$key</a>&nbsp";
     }
-    print "<br>--<i>$modoption[0]</i>--</P>";
-    if($modoption[2] eq 'showpost')
-    {
-        &DescribePostUrl($_[0],$_[1],$pages{$modoption[0]},$modoption[1]);
-    }
-    else
-    {
-        &QueryClickability($_[0],$_[1],$pages{$modoption[0]},$modoption[1]);
-    }
+    print "<br>--<i>$modoption[0]</i>--";
+    print '<br/>'.$modoption[2] if($modoption[2]);
+    print '</P>';
+    &QueryClickability($_[0],$_[1],$pages{$modoption[0]},$modoption[1],$modoption[2]);
     &Disconnect;
 }
 
-#Отображение списка URL в заданном REFERER
-sub DescribePostUrl()
-{
-    return 1;
-}
-
 #Процедура подсчета кликабельности
-#USAGE: $date_in,$date_out,$page(EXP),$expand
+#USAGE: $date_in,$date_out,$page(EXP),$expand || $show,FILTER
 #EXP: URL, REFERER
 sub QueryClickability()
 {
@@ -65,11 +54,18 @@ sub QueryClickability()
     my $bgcolor=0;
     my $totalclicks=0;
     my $rowlimit=20;#Ограничение на первичный вывод строк
+    my %invert_pages=('URL'=>'Posts',
+               'REFERER'=>'Shop URL');#Хеш для раскрытия группировки
+    my %invert_types=('URL'=>'REFERER',
+               'REFERER'=>'URL');
     my %domain=('URL'=>'http://',
                 'REFERER'=>'http://www.web2buy.ru'
                );
-    $SQL="SELECT $_[2],COUNT(URL) AS CLICKABILITY FROM URLSTAT WHERE LENGTH(REFERER)>0 AND DATE>='$_[0]' AND DATE<='$_[1]'
-            GROUP BY $_[2] ORDER BY CLICKABILITY DESC";
+    $SQL="SELECT $_[2],COUNT(URL) AS CLICKABILITY FROM URLSTAT WHERE LENGTH(REFERER)>0 AND DATE>='$_[0]' AND DATE<='$_[1]' ";
+    if($_[3] eq 'open'){
+        $SQL=$SQL." AND $invert_types{$_[2]}='$_[4]'";#Фильтрация по типу URL || REFERRER
+    }
+    $SQL=$SQL." GROUP BY $_[2] ORDER BY CLICKABILITY DESC";
     $sth=$dbh->prepare($SQL);#print $SQL;
     $sth->execute();
     if($sth->rows)
@@ -83,15 +79,16 @@ sub QueryClickability()
             $totalclicks=$totalclicks+$ref->{'CLICKABILITY'};
             if($n<=$rowlimit || $_[3])
             {
-                print "<tr bgcolor=$bgcolor><td>$n</td><td><a href=\"$domain{$_[2]}$ref->{$_[2]}\" target=_blank title='Open in new window'>$name</a>&nbsp;<a href=\"#1\" target=_self title='Expand post'>+</a></td><td>$ref->{'CLICKABILITY'}</td></tr>\n";
+                print "<tr bgcolor=$bgcolor><td>$n</td><td><a href=\"$domain{$_[2]}$ref->{$_[2]}\" target=_blank title='Open in new window'>$name</a>&nbsp;<a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$invert_pages{$_[2]}:open:$ref->{$_[2]}\" target=_self title='Open'>+</a></td><td>$ref->{'CLICKABILITY'}</td></tr>\n";
             }
         }
-        if(!$_[3] && $n>$rowlimit)#Если строк меньше rowlimit, не показыаем тег more
+        if(!$_[3] && $n>$rowlimit)#Если строк больше rowlimit, показыаем тег more
         {
             $n=$n-$rowlimit;
             print "<tr align=center><td colspan=2><a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$modoption:expand\">more ($n)</a></td><td>...</td></tr>\n";
         }
-        print "<tr><td colspan=2 align=center><i>Total clicks</i></td><td><b>$totalclicks</b></td></tr></table>\n";    }
+        print "<tr><td colspan=2 align=center><i>Total clicks</i></td><td><b>$totalclicks</b></td></tr></table>\n";
+    }
     else
     {
         print '<P align=center class=message>Данные за выбраный период отсутствуют.</P>';
