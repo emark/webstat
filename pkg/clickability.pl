@@ -76,6 +76,7 @@ sub QueryClickability()
             $n++;
             $bgcolor=&Syspkg::Rowcolor($n);#Подсветка строк таблицы
             $name=substr($ref->{$_[2]},0,250);
+            $name=~s/http:\/\/www\.web2buy\.ru//;#Удаляем имя хоста
             $totalclicks=$totalclicks+$ref->{'CLICKABILITY'};
             if($n<=$rowlimit || $_[3])
             {
