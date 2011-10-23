@@ -280,7 +280,7 @@ sub CheckURL()
     {
         while($ref=$sth->fetchrow_hashref)
         {
-            for(my $n=0;$n<=26;$n++)
+            for(my $n=0;$n<=27;$n++)
             {
                 $companyreg{$sth->{'NAME'}->[$n]}=$ref->{$sth->{'NAME'}->[$n]};
             }
