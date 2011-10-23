@@ -7,7 +7,7 @@ use constant VERSION=>1.2;
 require 'pkg/datecal.pl';
 require 'pkg/syspkg.pl';
 
-my @modules=(require 'pkg/loyalty.pl',
+my @modules=(#require 'pkg/loyalty.pl',
              require 'pkg/clickability.pl',
              require 'pkg/chart.pl',
              require 'pkg/registry.pl',

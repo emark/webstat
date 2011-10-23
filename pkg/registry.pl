@@ -86,8 +86,11 @@ sub ExportCSV()
                      -value=>$module);
         print hidden(-name=>'modoption',
                      -value=>'export');
+        my $n=0;
         while ($ref=$sth->fetchrow_hashref)
         {
+            $n++;
+            print "$n. ";
             print checkbox(-name=>'modoption',
                            -value=>$ref->{'ID'},
                            -label=>''
@@ -101,7 +104,7 @@ sub ExportCSV()
     {
         my @id=@_;
         shift @id;
-        $SQL="SELECT ID,URL,EMAIL FROM COMPANYREF WHERE ID=0 ";
+        $SQL="SELECT ID,URL,EMAIL,TEL FROM COMPANYREF WHERE ID=0 ";
         foreach my $key(@id)
         {
             $SQL=$SQL." OR ID=$key";
@@ -111,7 +114,7 @@ sub ExportCSV()
         my $pnum=0;
         while ($ref=$sth->fetchrow_hashref)
         {
-            print "<a href=\"http://www.web2buy.ru/link/?url=$ref->{'URL'}\" title='Переход в интернет-магазин' target=_blank>$ref->{'URL'}</a><P id=\"shopinfo-$pnum\"><a href=\"#1\" onClick=\"javascript:ShopInfo('$ref->{'URL'}','shopinfo-$pnum')\" title='ОГРН, условия доставки, оплаты'>Подробнее</a></P>;$ref->{'URL'};$ref->{'EMAIL'}\n";
+            print "<a href=\"http://www.web2buy.ru/link/?url=$ref->{'URL'}\" title='Переход в интернет-магазин' target=_blank>$ref->{'URL'}</a><P id=\"shopinfo-$pnum\"><a href=\"#1\" onClick=\"javascript:ShopInfo('$ref->{'URL'}','shopinfo-$pnum')\" title='ОГРН, условия доставки, оплаты'>Подробнее</a></P>;$ref->{'URL'};$ref->{'EMAIL'};$ref->{'TEL'}\n";
             $pnum++;
         }
     }
@@ -147,7 +150,7 @@ sub CompanyForm()
     print '<tr><td rowspan=2>';
     #print p("ID: $companyreg{'ID'}");
     print "<input type=hidden name=modoption value=$companyreg{'ID'}>";
-    print "<input type=text name=modoption value='$companyreg{'ORGANIZATION'}'>&nbsp;Наименование магазина<br/>";
+    print "<input type=text name=modoption value='$companyreg{'ORGANIZATION'}'>&nbsp;Наименование магазина (<a href=\"http://$companyreg{'URL'}\">weblink</a>)<br/>";
     print "<input type=text name=modoption value='$companyreg{'OGRN'}'>&nbsp;ОГРН&nbsp;";
     #if($companyreg{'OGRN'})#Просмотр сведений на сайте ИФНС
     #{
@@ -156,7 +159,8 @@ sub CompanyForm()
     print '<br/>';
     print "<input type=text size=35 name=modoption value='$companyreg{'ADDRESS'}'>&nbsp;Адрес продавца<br/>";
     print "<input type=text size=35 name=modoption value='$companyreg{'FNAME'}'>&nbsp;Полное фирменное наименование<br/>";
-    print "<input type=text name=modoption value='$companyreg{'EMAIL'}'>&nbsp;Эл. почта<br/><hr width=100%>";
+    print "<input type=text size=35 name=modoption value='$companyreg{'TEL'}'>&nbsp;Контактный телефон<br/>";
+    print "<input type=text name=modoption value='$companyreg{'EMAIL'}'>&nbsp;Эл. почта (<a href=\"mailto:$companyreg{'EMAIL'}\">Сообщение</a>)<br/><hr width=100%>";
     print &SelectHTML($companyreg{'CONSPROP'}).'&nbsp;Основные свойства товара<br/>';
     print &SelectHTML($companyreg{'PRICEINFO'}).'&nbsp;Цена и условия приобретения<br/>';
     print &SelectHTML($companyreg{'DELIVERYINFO'}).'&nbsp;Информация о доставке<br/>';
@@ -225,27 +229,28 @@ sub SaveCompanyForm()
          `OGRN`='$_[4]',
          `ADDRESS`='$_[5]',
          `FNAME`='$_[6]',
-         `EMAIL`='$_[7]',
-         `CONSPROP`=$_[8],
-         `PRICEINFO`=$_[9],
-         `DELIVERYINFO`=$_[10],
-         `GUARANTEE`=$_[11],
-         `ACCEPT`=$_[12],
-         `CASHBACK`=$_[13],
-          `GOODBACKDAYS`=$_[14],
+         `TEL`='$_[7]',
+         `EMAIL`='$_[9]',
+         `CONSPROP`=$_[9],
+         `PRICEINFO`=$_[10],
+         `DELIVERYINFO`=$_[11],
+         `GUARANTEE`=$_[12],
+         `ACCEPT`=$_[13],
+         `CASHBACK`=$_[14],
+          `GOODBACKDAYS`=$_[15],
          `SYSDATE`=NOW(),
-         `DT_MAIL`=$_[16],
-         `DT_CC`=$_[17],
-         `DT_TC`=$_[18],
-          `DT_CR`=$_[19],
-          `DT_PP`=$_[20],
-          `PT_BP`=$_[21],
-          `PT_EM`=$_[22],
-          `PT_CH`=$_[23],
-          `PT_PM`=$_[24],
-          `PT_BC`=$_[25],
-          `PT_TP`=$_[26],
-          `TAGS`=\"$_[27]\" 
+         `DT_MAIL`=$_[17],
+         `DT_CC`=$_[18],
+         `DT_TC`=$_[19],
+          `DT_CR`=$_[20],
+          `DT_PP`=$_[21],
+          `PT_BP`=$_[22],
+          `PT_EM`=$_[23],
+          `PT_CH`=$_[24],
+          `PT_PM`=$_[25],
+          `PT_BC`=$_[26],
+          `PT_TP`=$_[27],
+          `TAGS`=\"$_[28]\" 
         WHERE ID=$_[2]";
     }
     else
