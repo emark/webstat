@@ -230,7 +230,7 @@ sub SaveCompanyForm()
          `ADDRESS`='$_[5]',
          `FNAME`='$_[6]',
          `TEL`='$_[7]',
-         `EMAIL`='$_[9]',
+         `EMAIL`='$_[8]',
          `CONSPROP`=$_[9],
          `PRICEINFO`=$_[10],
          `DELIVERYINFO`=$_[11],
