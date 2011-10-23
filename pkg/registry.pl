@@ -277,7 +277,7 @@ sub CheckURL()
     $sth=$dbh->prepare($SQL);
     $sth->execute();
     $SQL="SELECT `ID`, `ORGANIZATION`, `URL`, `OGRN`, `CONSPROP`, `ADDRESS`, `FNAME`, `PRICEINFO`, `DELIVERYINFO`, `GUARANTEE`, `ACCEPT`, `CASHBACK`,`GOODBACKDAYS`,
-    `SYSDATE`, `EMAIL`, `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP`, TAGS FROM COMPANYREF WHERE URL='$_[0]'";
+    `SYSDATE`, `TEL`,`EMAIL`, `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP`, TAGS FROM COMPANYREF WHERE URL='$_[0]'";
     $sth=$dbh->prepare($SQL);#print $SQL;
     $sth->execute();
     print "<PRE>Checked: $status[$sth->rows]</PRE>";
