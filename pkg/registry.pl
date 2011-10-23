@@ -148,19 +148,14 @@ sub CompanyForm()
     print "<input type=hidden value='$companyreg{'URL'}' name=modoption>";
     print '<table border=0>';
     print '<tr><td rowspan=2>';
-    #print p("ID: $companyreg{'ID'}");
     print "<input type=hidden name=modoption value=$companyreg{'ID'}>";
-    print "<input type=text name=modoption value='$companyreg{'ORGANIZATION'}'>&nbsp;Наименование магазина (<a href=\"http://$companyreg{'URL'}\">weblink</a>)<br/>";
+    print "<input type=text name=modoption value='$companyreg{'ORGANIZATION'}'>&nbsp;Наименование магазина (<a href=\"http://$companyreg{'URL'}\" target=_blank>weblink</a>)<br/>";
     print "<input type=text name=modoption value='$companyreg{'OGRN'}'>&nbsp;ОГРН&nbsp;";
-    #if($companyreg{'OGRN'})#Просмотр сведений на сайте ИФНС
-    #{
-        #print "<a href=\"http://egrul.nalog.ru/fns/\" target=_blank>Данные ИФНС</a>";
-    #}
     print '<br/>';
     print "<input type=text size=35 name=modoption value='$companyreg{'ADDRESS'}'>&nbsp;Адрес продавца<br/>";
     print "<input type=text size=35 name=modoption value='$companyreg{'FNAME'}'>&nbsp;Полное фирменное наименование<br/>";
     print "<input type=text size=35 name=modoption value='$companyreg{'TEL'}'>&nbsp;Контактный телефон<br/>";
-    print "<input type=text name=modoption value='$companyreg{'EMAIL'}'>&nbsp;Эл. почта (<a href=\"mailto:$companyreg{'EMAIL'}\">Сообщение</a>)<br/><hr width=100%>";
+    print "<input type=text name=modoption value='$companyreg{'EMAIL'}'>&nbsp;Эл. почта (<a href=\"mailto:$companyreg{'EMAIL'}\">сообщение</a>)<br/><hr width=100%>";
     print &SelectHTML($companyreg{'CONSPROP'}).'&nbsp;Основные свойства товара<br/>';
     print &SelectHTML($companyreg{'PRICEINFO'}).'&nbsp;Цена и условия приобретения<br/>';
     print &SelectHTML($companyreg{'DELIVERYINFO'}).'&nbsp;Информация о доставке<br/>';
@@ -255,10 +250,10 @@ sub SaveCompanyForm()
     }
     else
     {
-        $SQL="INSERT INTO COMPANYREF(`URL`,`ORGANIZATION`, `OGRN`,`ADDRESS`, `FNAME`,`EMAIL`,`CONSPROP`, `PRICEINFO`, `DELIVERYINFO`, `GUARANTEE`, `ACCEPT`, `CASHBACK`,
+        $SQL="INSERT INTO COMPANYREF(`URL`,`ORGANIZATION`, `OGRN`,`ADDRESS`, `FNAME`,`TEL`,`EMAIL`,`CONSPROP`, `PRICEINFO`, `DELIVERYINFO`, `GUARANTEE`, `ACCEPT`, `CASHBACK`,
         `GOODBACKDAYS`,`SYSDATE`,  `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP`,`TAGS`)
-        VALUES('$_[1]','$_[3]','$_[4]','$_[5]','$_[6]','$_[7]',$_[8],$_[9],$_[10],$_[11],$_[12],$_[13],$_[14],NOW(),$_[16],$_[17],$_[18],$_[19],$_[20],$_[21],$_[22],$_[23],
-        $_[24],$_[25],$_[26],\"$_[27]\")";
+        VALUES('$_[1]','$_[3]','$_[4]','$_[5]','$_[6]','$_[7]','$_[8]',$_[9],$_[10],$_[11],$_[12],$_[13],$_[14],NOW(),$_[16],$_[17],$_[18],$_[19],$_[20],$_[21],$_[22],$_[23],
+        $_[24],$_[25],$_[26],$_[27],\"$_[28]\")";
     }
     #print $SQL;
     $sth=$dbh->prepare($SQL);
