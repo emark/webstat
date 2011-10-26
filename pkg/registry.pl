@@ -252,7 +252,7 @@ sub SaveCompanyForm()
     {
         $SQL="INSERT INTO COMPANYREF(`URL`,`ORGANIZATION`, `OGRN`,`ADDRESS`, `FNAME`,`TEL`,`EMAIL`,`CONSPROP`, `PRICEINFO`, `DELIVERYINFO`, `GUARANTEE`, `ACCEPT`, `CASHBACK`,
         `GOODBACKDAYS`,`SYSDATE`,  `DT_MAIL`, `DT_CC`, `DT_TC`, `DT_CR`, `DT_PP`, `PT_BP`, `PT_EM`, `PT_CH`, `PT_PM`, `PT_BC`, `PT_TP`,`TAGS`)
-        VALUES('$_[1]','$_[3]','$_[4]','$_[5]','$_[6]','$_[7]','$_[8]',$_[9],$_[10],$_[11],$_[12],$_[13],$_[14],NOW(),$_[16],$_[17],$_[18],$_[19],$_[20],$_[21],$_[22],$_[23],
+        VALUES('$_[1]','$_[3]','$_[4]','$_[5]','$_[6]','$_[7]','$_[8]',$_[9],$_[10],$_[11],$_[12],$_[13],$_[14],$_[15],NOW(),$_[17],$_[18],$_[19],$_[20],$_[21],$_[22],$_[23],
         $_[24],$_[25],$_[26],$_[27],\"$_[28]\")";
     }
     #print $SQL;
