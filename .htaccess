@@ -1,6 +1,0 @@
-<Limit GET POST>
-	require valid-user
-</Limit>
-AuthType Basic
-AuthName "Please, login."
-AuthUserFile /home/hosting_locumtest/projects/web2buy/etc/.htpasswd

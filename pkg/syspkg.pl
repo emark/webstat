@@ -5,7 +5,7 @@ BEGIN;
 
 sub DBconf()
 {
-    open (DBCONF,"< db.conf") || die "Error open dbconfig file";
+    open (DBCONF,"< @_") || die "Error open dbconfig file";
     my @dbconf=<DBCONF>;
     close DBCONF;
     chomp @dbconf;

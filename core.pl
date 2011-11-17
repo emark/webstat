@@ -12,7 +12,7 @@ my @modules=(require 'pkg/loyalty.pl',
              require 'pkg/chart.pl',
              require 'pkg/registry.pl',
              );
-
+our $dbconf='db.conf';#Database configfile
 my $query=new CGI;
 my $module=param('module') || '';
 my @modoption=param('modoption');#Module option parameters
