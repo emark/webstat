@@ -5,7 +5,7 @@ use CGI qw/:standard -debug/;
 use CGI::Carp 'fatalsToBrowser';
 use constant VERSION=>1.2;
 require 'pkg/datecal.pl';
-require 'pkg/syspkg.pl';
+require 'sys/syspkg.pl';
 
 my @modules=(require 'pkg/loyalty.pl',
              require 'pkg/clickability.pl',

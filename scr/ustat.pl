@@ -3,7 +3,7 @@ use strict;
 use constant VERSION=>0.7;
 use CGI;
 use DBI;
-require '../pkg/syspkg.pl';
+require '../sys/syspkg.pl';
 
 my $dbconf='../db.conf';
 my $dbh=DBI->connect(&Syspkg::DBconf($dbconf));
