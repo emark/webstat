@@ -11,6 +11,7 @@ my @modules=(require 'pkg/loyalty.pl',
              require 'pkg/clickability.pl',
              require 'pkg/chart.pl',
              require 'pkg/registry.pl',
+             require 'pkg/userstat.pl',
              );
 our $dbconf='db.conf';#Database configfile
 my $query=new CGI;
@@ -73,21 +74,21 @@ sub StartModule()#Starting selected module
     if($module eq $modules[0])
     {
         &Loyalty::Init(Datecal::Period(),@modoption);    
-    }
-    elsif($module eq $modules[1])
+    }elsif($module eq $modules[1])
     {
-        &Clickability::Init(Datecal::Period(),@modoption);    
-    }
-    elsif($module eq $modules[2])
+        &Clickability::Init(Datecal::Period(),@modoption);
+    }elsif($module eq $modules[2])
     {
         &Chart::Init(Datecal::Period(),@modoption);    
-    }
-    elsif($module eq $modules[3])
+    }elsif($module eq $modules[3])
     {
         &Registry::Init(@modoption);
+    }elsif($module eq $modules[4])
+    {
+        &Statistics::Init(Datecal::Period(),@modoption);
     }
     else#Default module
     {
-        &Loyalty::Init(Datecal::Period(),@modoption);
+        &Clickability::Init(Datecal::Period(),@modoption);
     }
 }
