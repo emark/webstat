@@ -1,20 +1,20 @@
-#!/usr/bin/perl -w
+#!K:/Perl/bin/perl.exe
+##!/usr/bin/perl -w
 use strict;
 use DBI;
-use CGI qw/:standard -debug/;
+use CGI qw/:standard/; #-debug
 use CGI::Carp 'fatalsToBrowser';
 use constant VERSION=>1.2;
 require 'pkg/datecal.pl';
 require 'sys/syspkg.pl';
 
-my @modules=(require 'pkg/loyalty.pl',
+my @modules=(require 'pkg/welcome.pl',
              require 'pkg/clickability.pl',
              require 'pkg/chart.pl',
              require 'pkg/registry.pl',
              require 'pkg/userstat.pl',
              );
 our $dbconf='db.conf';#Database configfile
-my $query=new CGI;
 my $module=param('module') || '';
 my @modoption=param('modoption');#Module option parameters
 &Datecal::GetDates(param('date_in'),
@@ -26,8 +26,7 @@ sub HTMLDisplay()#Generate HTML headers & content
 {
     print header(-charset=>'UTF-8');
     print start_html(-title=>'Webstat '.VERSION,
-                             -style=>'/stat/style.css'
-                             );
+                     -style=>'static/style.css');
     print start_form(-name=>'DatePeriod',
                      -method=>'post',
                      -action=>'?'
@@ -73,7 +72,7 @@ sub StartModule()#Starting selected module
 {
     if($module eq $modules[0])
     {
-        &Loyalty::Init(Datecal::Period(),@modoption);    
+        &Welcome::Init(@modoption);    
     }elsif($module eq $modules[1])
     {
         &Clickability::Init(Datecal::Period(),@modoption);
@@ -89,6 +88,6 @@ sub StartModule()#Starting selected module
     }
     else#Default module
     {
-        &Clickability::Init(Datecal::Period(),@modoption);
+        &Welcome::Init(@modoption);
     }
 }

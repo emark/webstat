@@ -3,18 +3,8 @@ use strict;
 use constant VERSION=>1.1;
 BEGIN;
 
-sub DBconf()
-{
-    open (DBCONF,"< @_") || die "Error open dbconfig file";
-    my @dbconf=<DBCONF>;
-    close DBCONF;
-    chomp @dbconf;
-    return @dbconf;
-}
-
-#Подсветка таблицы "зеброй" в строках
-sub Rowcolor()
-{
+#Colorizing table
+sub Rowcolor(){
     my $color=0;
     if($_[0] & 1)
     {
@@ -27,5 +17,15 @@ sub Rowcolor()
     return $color;
 }
 
+#Reading data from static files;
+sub Static(){
+    my $statdir='static';
+    my @data='';
+    open (STATIC,"< $statdir/@_") || die "Can't open static file: $_";
+    @data=<STATIC>;
+    close STATIC;
+    chomp @data;
+    return @data;
+}
 return 1;
 END;
