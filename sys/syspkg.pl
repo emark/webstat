@@ -21,7 +21,7 @@ sub Rowcolor(){
 sub Static(){
     my $statdir='static';
     my @data='';
-    open (STATIC,"< $statdir/@_") || die "Can't open static file: $_";
+    open (STATIC,"< $statdir/@_") || die "Can't open static file: @_";
     @data=<STATIC>;
     close STATIC;
     chomp @data;

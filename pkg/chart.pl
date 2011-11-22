@@ -21,9 +21,11 @@ sub Init()
 {
     &main::HTMLDisplay;
     #pages - инициализация страниц модуля. alias=>MODULE_NAME
-    my %pages=('Loyalty'=>'Loyalty',
+    my %pages=(
                'Clickability'=>'Clickability',
-               ''=>'Loyalty'#default page
+               'Users by hour'=>'UbH',
+               'Users by day'=>'UbD',
+               ''=>'Clickability'#default page
                );
     my @modoption=('','');
     if($_[2])
@@ -45,38 +47,45 @@ sub Init()
 
 #Процедура визуализации данных
 #USAGE: $date_in,$date_out,$modoption(page)
-#Pages: Loyalty, Clickability
+#Pages: Loyalty, Clickability, Ubh, Ubd
 sub BuildChart()
 {
     my $var1='';
     my $var2='';
-    my $start_month='';
-    my $finish_month='';
+    my $start_axis='';
+    my $finish_axis='';
+    my $maxvalue=0;#for define axis  value
+    my $labelx='';#Label value for x axis
     my %SQL_SRC=('Loyalty'=>"SELECT MONTH(DATE),SUM(IF(ANSWER>0,1,0)),COUNT(ANSWER) FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]' GROUP BY MONTH(DATE) ORDER BY DATE",
-                 'Clickability'=>"SELECT MONTH(DATE), COUNT(URL), COUNT(REFERER) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY MONTH(DATE) ORDER BY DATE"
+                 'Clickability'=>"SELECT MONTH(DATE), COUNT(URL), COUNT(REFERER) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY MONTH(DATE) ORDER BY DATE",
+                 'UbH'=>"SELECT HOUR(DATE) AS HOUR,COUNT(IP),0 FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY HOUR ORDER BY HOUR",
+                 'UbD'=>"SELECT DAY(DATE) AS DAY,COUNT(IP),0 FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY DAY ORDER BY DAY"
                 );
     $sth=$dbh->prepare($SQL_SRC{$_[2]});#print $SQL_SRC{$_[2]};
     $sth->execute;
-    print "<pre>Month\tData1\tData2\n";
+    print "<pre>Date\tData1\tData2\n";
     while ($ref=$sth->fetchrow_arrayref)
     {
         print "$ref->[0]\t$ref->[1]\t$ref->[2]\n"; #Display data
         $var1=$var1."$ref->[1],";
         $var2=$var2."$ref->[2],";
-        if(!$start_month)#Устанавливаем начало и окончание периода для оси X
-        {
-            $start_month=$ref->[0];
-        }
-        else
-        {
-            $finish_month=$ref->[0];
-        }
+        $maxvalue=$ref->[1] if $ref->[1]>$maxvalue;
+        $labelx=$labelx."$ref->[0]|";
+        #if(!$start_axis)#Устанавливаем начало и окончание периода для оси X
+        #{
+        #    $start_axis=$ref->[0];
+        #}
+        #else
+        #{
+        #    $finish_axis=$ref->[0];
+        #}
     }
     chop $var1;
     chop $var2;
     #Заполнение графиков данными
-    my %IMG_SRC=('Loyalty'=>"http://chart.apis.google.com/chart?chxr=2,$start_month,$finish_month&chxt=y,r,x&chbh=a,7&chs=500x325&cht=bvg&chco=A2C180,3D7930&chd=t:$var1|$var2&chg=5,5,0,0&chtt=Data+for+Loyalty\" width=\"500\" height=\"325\" alt=\"Loyalty\"",
-                 'Clickability'=>"http://chart.apis.google.com/chart?chxr=0,0,6000|1,$start_month,$finish_month&chxt=y,x&chs=500x325&cht=lc&chco=A2C180&chds=0,6000&chd=t:$var1&chg=5,5,0,0&chls=3&chm=o,008000,0,0:12:1,5&chtt=Data+for+Clickability\" width=\"500\" height=\"325\" alt=\"Clickability\""
+    my %IMG_SRC=('Clickability'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chs=500x325&cht=lc&chco=3D7930&chds=0,$maxvalue&chd=t:$var1&chg=14.3,-1,1,1&chls=1&chm=B,C5D4B5BB,0,0,0&chtt=Data+for+$_[2]\" width=\"500\" height=\"325\" alt=\"Clickability\"",
+                 'UbH'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var1&chtt=Date+for+$_[2]",
+                 'UbD'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var1&chtt=Date+for+$_[2]",
                 );
     print '</pre><center>Warning: use only complete year period!<br>';
     print '<img src="';

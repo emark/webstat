@@ -1,5 +1,4 @@
-#!K:/Perl/bin/perl.exe
-##!/usr/bin/perl -w
+#!/usr/bin/perl -w
 use strict;
 use DBI;
 use CGI qw/:standard/; #-debug
@@ -12,7 +11,6 @@ my @modules=(require 'pkg/welcome.pl',
              require 'pkg/clickability.pl',
              require 'pkg/chart.pl',
              require 'pkg/registry.pl',
-             require 'pkg/userstat.pl',
              );
 our $dbconf='db.conf';#Database configfile
 my $module=param('module') || '';
@@ -25,8 +23,8 @@ my @modoption=param('modoption');#Module option parameters
 sub HTMLDisplay()#Generate HTML headers & content
 {
     print header(-charset=>'UTF-8');
-    print start_html(-title=>'Webstat '.VERSION,
-                     -style=>'static/style.css');
+    print start_html(-title=>'Webstat '.VERSION);
+    print &Syspkg::Static('style.css');
     print start_form(-name=>'DatePeriod',
                      -method=>'post',
                      -action=>'?'
@@ -82,11 +80,7 @@ sub StartModule()#Starting selected module
     }elsif($module eq $modules[3])
     {
         &Registry::Init(@modoption);
-    }elsif($module eq $modules[4])
-    {
-        &Statistics::Init(Datecal::Period(),@modoption);
-    }
-    else#Default module
+    }else#Default module
     {
         &Welcome::Init(@modoption);
     }
