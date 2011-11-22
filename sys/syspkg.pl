@@ -19,7 +19,7 @@ sub Rowcolor(){
 
 #Reading data from static files;
 sub Static(){
-    my $statdir='static';
+    my $statdir='../static';
     my @data='';
     open (STATIC,"< $statdir/@_") || die "Can't open static file: @_";
     @data=<STATIC>;

@@ -6,7 +6,7 @@ use DBI;
 require '../sys/syspkg.pl';
 
 my $dbconf='../db.conf';
-my $dbh=DBI->connect(&Syspkg::DBconf($dbconf));
+my $dbh=DBI->connect(&Syspkg::Static($dbconf));
 my $sth=undef;
 my $SQL='';
 #Define CGI variables
