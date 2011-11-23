@@ -5,9 +5,10 @@ use CGI;
 use DBI;
 require '../sys/syspkg.pl';
 
-my $path='../';
+#Change current directory
+chdir('../');
 my $dbconf='db.conf';
-my $dbh=DBI->connect(&Syspkg::Static($path,$dbconf));
+my $dbh=DBI->connect(&Syspkg::Static($dbconf));
 my $sth=undef;
 my $SQL='';
 #Define CGI variables
