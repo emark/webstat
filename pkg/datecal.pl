@@ -82,12 +82,14 @@ sub PresetDates()
     my $tommorow=$today->clone()->add(days=>1)->ymd;
     my $week=$today->clone()->subtract(days=>7)->ymd;
     my $month=$today->clone()->set_day(1)->ymd;
+    my $year=$today->clone()->set_month(1)->set_day(1)->ymd;
     $today=$today->ymd;
     my ($preset,$date_in,$date_out);
     my @PresetDates=("Today;$today;$tommorow",
                      "Yesterday;$yesterday;$today",
                      "For 7 days;$week;$today",
-                     "Month;$month;$today"
+                     "Month;$month;$today",
+                     "Year;$year;$today",
                      );
     #print $today,$yesterday,$tommorow,$week;
     foreach my $key(@PresetDates)
