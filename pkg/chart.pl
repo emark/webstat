@@ -21,10 +21,13 @@ sub Init()
     &main::HTMLDisplay;
     #pages - инициализация страниц модуля. alias=>MODULE_NAME
     my %pages=(
-               'Clicks by month'=>'CbM',
-               'Clicks by hour'=>'CbH',
-               'Clicks by day'=>'CbD',
-               ''=>'Clickability'#default page
+               'CPM'=>'CpM',
+               'CPD'=>'CpD',
+               'CPH'=>'CpH',
+               'UPM'=>'UpM',
+               'UPD'=>'UpD',
+               'UPH'=>'UpH',
+               ''=>'CpH'#default page
                );
     my @modoption=('','');
     if($_[2])
@@ -49,36 +52,39 @@ sub Init()
 #Pages: Loyalty, Clickability, Ubh, Ubd
 sub BuildChart()
 {
-    my $var1='';
-    my $var2='';
+    my $var='';
     my $maxvalue=0;#for define axis  value
-    my $totalvar1=0;
-    my $totalvar2=0;
+    my $totalvar=0;
     my $labelx='';#Label value for x axis
     my %SQL_SRC=('Loyalty'=>"SELECT MONTH(DATE),SUM(IF(ANSWER>0,1,0)),COUNT(ANSWER) FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]' GROUP BY MONTH(DATE) ORDER BY DATE",
-                 'CbM'=>"SELECT MONTH(DATE), COUNT(URL), COUNT(REFERER) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY MONTH(DATE) ORDER BY DATE",
-                 'CbH'=>"SELECT HOUR(DATE) AS HOUR,COUNT(IP),0 FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY HOUR ORDER BY HOUR",
-                 'CbD'=>"SELECT DAY(DATE) AS DAY,COUNT(IP),0 FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY DAY ORDER BY DAY"
+                 'CpM'=>"SELECT MONTH(DATE), COUNT(URL) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY MONTH(DATE) ORDER BY DATE",
+                 'CpD'=>"SELECT DAY(DATE) AS DAY,COUNT(IP) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY DAY ORDER BY DAY",
+                 'CpH'=>"SELECT HOUR(DATE) AS HOUR,COUNT(IP) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY HOUR ORDER BY HOUR",
+                 'UpM'=>"SELECT DATE,SUM(IP) FROM (SELECT MONTH(DATE) AS DATE,1 AS IP FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY IP) AS T1 GROUP BY DATE ORDER BY DATE",
+                 'UpD'=>"SELECT DATE,SUM(IP) FROM (SELECT DAY(DATE) AS DATE,1 AS IP FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY IP) AS T1 GROUP BY DATE ORDER BY DATE",
+                 'UpH'=>"SELECT DATE,SUM(IP) FROM (SELECT HOUR(DATE) AS DATE,1 AS IP FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY IP) AS T1 GROUP BY DATE ORDER BY DATE",
                 );
-    $sth=$dbh->prepare($SQL_SRC{$_[2]});print $SQL_SRC{$_[2]};
+    $sth=$dbh->prepare($SQL_SRC{$_[2]});
+    #print $SQL_SRC{$_[2]};
     $sth->execute;
-    print "<pre>Date\tData1\tData2\n";
+    print "<pre>Date\tData\n";
     while ($ref=$sth->fetchrow_arrayref)
     {
-        print "$ref->[0]\t$ref->[1]\t$ref->[2]\n"; #Display data
-        $var1=$var1."$ref->[1],";
-        $totalvar1=$totalvar1+$ref->[1];
-        $var2=$var2."$ref->[2],";
+        print "$ref->[0]\t$ref->[1]\n"; #Display data
+        $var=$var."$ref->[1],";
+        $totalvar=$totalvar+$ref->[1];
         $maxvalue=$ref->[1] if $ref->[1]>$maxvalue;
         $labelx=$labelx."$ref->[0]|";
     }
-    print "------\nTotal\t$totalvar1\t$totalvar2";
-    chop $var1;
-    chop $var2;
+    print "---\nTotal\t$totalvar";
+    chop $var;
     #Заполнение графиков данными
-    my %IMG_SRC=('CbM'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chs=500x325&cht=lc&chco=3D7930&chds=0,$maxvalue&chd=t:$var1&chg=14.3,-1,1,1&chls=1&chm=B,C5D4B5BB,0,0,0&chtt=Data+for+$_[2]\" width=\"500\" height=\"325\" alt=\"Clickability\"",
-                 'CbH'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var1&chtt=Data+for+$_[2]",
-                 'CbD'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var1&chtt=Data+for+$_[2]",
+    my %IMG_SRC=('CpM'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chs=500x325&cht=lc&chco=3D7930&chds=0,$maxvalue&chd=t:$var&chg=14.3,-1,1,1&chls=1&chm=B,C5D4B5BB,0,0,0&chtt=Data+for+$_[2]",
+                 'CpD'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var&chtt=Data+for+$_[2]",
+                 'CpH'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var&chtt=Data+for+$_[2]",
+                 'UpM'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chs=500x325&cht=lc&chco=00799B&chds=0,$maxvalue&chd=t:$var&chg=14.3,-1,1,1&chls=1&chm=B,ADDDEABB,0,0,0&chtt=Data+for+$_[2]",
+                 'UpD'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=00ACDC&chds=0,$maxvalue&chd=t:$var&chtt=Data+for+$_[2]",
+                 'UpH'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=00ACDC&chds=0,$maxvalue&chd=t:$var&chtt=Data+for+$_[2]",
                 );
     print '</pre><center>';
     print '<img src="';
