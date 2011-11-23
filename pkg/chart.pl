@@ -60,7 +60,7 @@ sub BuildChart()
                  'CbH'=>"SELECT HOUR(DATE) AS HOUR,COUNT(IP),0 FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY HOUR ORDER BY HOUR",
                  'CbD'=>"SELECT DAY(DATE) AS DAY,COUNT(IP),0 FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY DAY ORDER BY DAY"
                 );
-    $sth=$dbh->prepare($SQL_SRC{$_[2]});#print $SQL_SRC{$_[2]};
+    $sth=$dbh->prepare($SQL_SRC{$_[2]});print $SQL_SRC{$_[2]};
     $sth->execute;
     print "<pre>Date\tData1\tData2\n";
     while ($ref=$sth->fetchrow_arrayref)
@@ -77,8 +77,8 @@ sub BuildChart()
     chop $var2;
     #Заполнение графиков данными
     my %IMG_SRC=('CbM'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chs=500x325&cht=lc&chco=3D7930&chds=0,$maxvalue&chd=t:$var1&chg=14.3,-1,1,1&chls=1&chm=B,C5D4B5BB,0,0,0&chtt=Data+for+$_[2]\" width=\"500\" height=\"325\" alt=\"Clickability\"",
-                 'CbH'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var1&chtt=Date+for+$_[2]",
-                 'CbD'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var1&chtt=Date+for+$_[2]",
+                 'CbH'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var1&chtt=Data+for+$_[2]",
+                 'CbD'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var1&chtt=Data+for+$_[2]",
                 );
     print '</pre><center>';
     print '<img src="';
