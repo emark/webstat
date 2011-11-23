@@ -13,7 +13,6 @@ my $module='Charts';
 my $modoption='';
 
 BEGIN;
-
 #Процедура инициализации модуля
 #USAGE: $date_in,$date_out,$modoption(EXP,expand)
 #EXP: URL, REFERER
@@ -22,9 +21,9 @@ sub Init()
     &main::HTMLDisplay;
     #pages - инициализация страниц модуля. alias=>MODULE_NAME
     my %pages=(
-               'Clickability'=>'Clickability',
-               'Users by hour'=>'UbH',
-               'Users by day'=>'UbD',
+               'Clicks by month'=>'CbM',
+               'Clicks by hour'=>'CbH',
+               'Clicks by day'=>'CbD',
                ''=>'Clickability'#default page
                );
     my @modoption=('','');
@@ -57,9 +56,9 @@ sub BuildChart()
     my $totalvar2=0;
     my $labelx='';#Label value for x axis
     my %SQL_SRC=('Loyalty'=>"SELECT MONTH(DATE),SUM(IF(ANSWER>0,1,0)),COUNT(ANSWER) FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]' GROUP BY MONTH(DATE) ORDER BY DATE",
-                 'Clickability'=>"SELECT MONTH(DATE), COUNT(URL), COUNT(REFERER) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY MONTH(DATE) ORDER BY DATE",
-                 'UbH'=>"SELECT HOUR(DATE) AS HOUR,COUNT(IP),0 FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY HOUR ORDER BY HOUR",
-                 'UbD'=>"SELECT DAY(DATE) AS DAY,COUNT(IP),0 FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY DAY ORDER BY DAY"
+                 'CbM'=>"SELECT MONTH(DATE), COUNT(URL), COUNT(REFERER) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY MONTH(DATE) ORDER BY DATE",
+                 'CbH'=>"SELECT HOUR(DATE) AS HOUR,COUNT(IP),0 FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY HOUR ORDER BY HOUR",
+                 'CbD'=>"SELECT DAY(DATE) AS DAY,COUNT(IP),0 FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY DAY ORDER BY DAY"
                 );
     $sth=$dbh->prepare($SQL_SRC{$_[2]});#print $SQL_SRC{$_[2]};
     $sth->execute;
@@ -68,9 +67,8 @@ sub BuildChart()
     {
         print "$ref->[0]\t$ref->[1]\t$ref->[2]\n"; #Display data
         $var1=$var1."$ref->[1],";
-        $totalvar1=$totalvar1+$var1;
+        $totalvar1=$totalvar1+$ref->[1];
         $var2=$var2."$ref->[2],";
-        $totalvar2=$totalvar2+$var2;
         $maxvalue=$ref->[1] if $ref->[1]>$maxvalue;
         $labelx=$labelx."$ref->[0]|";
     }
@@ -78,11 +76,11 @@ sub BuildChart()
     chop $var1;
     chop $var2;
     #Заполнение графиков данными
-    my %IMG_SRC=('Clickability'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chs=500x325&cht=lc&chco=3D7930&chds=0,$maxvalue&chd=t:$var1&chg=14.3,-1,1,1&chls=1&chm=B,C5D4B5BB,0,0,0&chtt=Data+for+$_[2]\" width=\"500\" height=\"325\" alt=\"Clickability\"",
-                 'UbH'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var1&chtt=Date+for+$_[2]",
-                 'UbD'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var1&chtt=Date+for+$_[2]",
+    my %IMG_SRC=('CbM'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chs=500x325&cht=lc&chco=3D7930&chds=0,$maxvalue&chd=t:$var1&chg=14.3,-1,1,1&chls=1&chm=B,C5D4B5BB,0,0,0&chtt=Data+for+$_[2]\" width=\"500\" height=\"325\" alt=\"Clickability\"",
+                 'CbH'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var1&chtt=Date+for+$_[2]",
+                 'CbD'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var1&chtt=Date+for+$_[2]",
                 );
-    print '</pre><center>Warning: use only complete year period!<br>';
+    print '</pre><center>';
     print '<img src="';
     print $IMG_SRC{$_[2]};
     print '"/>';
