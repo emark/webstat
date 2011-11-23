@@ -22,7 +22,8 @@ sub Init()
         $modoption=$_[2];#Define global var
     }  
     #Connection with database
-    $dbh=DBI->connect(&Syspkg::Static($main::dbconf));
+    $dbh=DBI->connect(&Syspkg::Static($::dbconf));
+    $::dbconf=undef;
     $dbh->trace();
     &CommonStatistic();
     &Disconnect;

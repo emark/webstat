@@ -30,7 +30,8 @@ sub Init()
         @modoption=split (/:/,$_[2]);
         $modoption=$_[2];#Определяем глобальную переменную
     }    
-    $dbh=DBI->connect(&Syspkg::Static($main::dbconf));
+    $dbh=DBI->connect(&Syspkg::Static($::dbconf));
+    $::dbconf=undef;
     $dbh->trace();
     print "<P align=center>";
     foreach my $key(keys %pages)

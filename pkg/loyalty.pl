@@ -23,7 +23,8 @@ sub Init()
         $modoption=$_[2];#Определяем глобальную переменную    
     }  
     #Connection with database
-    $dbh=DBI->connect(&Syspkg::Static($main::dbconf));
+    $dbh=DBI->connect(&Syspkg::Static($::dbconf));
+    $::dbconf=undef;
     $dbh->trace();
     &QueryTopList($_[0],$_[1],$modoption[1]);
     &Disconnect;

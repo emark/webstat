@@ -2,7 +2,7 @@
 #Create with http://imagecharteditor.appspot.com/
 package Chart;
 use strict;
-use constant VERSION=>0.5;
+use constant VERSION=>0.6;
 
 #Database description
 my $dbh=undef;
@@ -29,16 +29,18 @@ sub Init()
                'UPH'=>'UpH',
                ''=>'CpH'#default page
                );
+    my @sortpages=('CPH','CPD','CPM','UPH','UPD','UPM');#Sorting pages
     my @modoption=('','');
     if($_[2])
     {
         @modoption=split (/:/,$_[2]);
         $modoption=$_[2];#Определяем глобальную переменную    
     }    
-    $dbh=DBI->connect(&Syspkg::Static($main::dbconf));
+    $dbh=DBI->connect(&Syspkg::Static($::dbconf));
+    $::dbconf=undef;#For close warning
     $dbh->trace();
     print "<P align=center>";
-    foreach my $key(keys %pages)
+    foreach my $key(@sortpages)
     {
         print "<a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$key\">$key</a>&nbsp";
     }

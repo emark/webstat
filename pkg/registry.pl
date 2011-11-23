@@ -46,7 +46,8 @@ sub Init()
         print "<br><i>$pagetitle{$modoption[0]}</i></P>";
     }    
     #Connection with database
-    $dbh=DBI->connect(&Syspkg::Static($main::dbconf));
+    $dbh=DBI->connect(&Syspkg::Static($::dbconf));
+    $::dbconf=undef;
     $dbh->trace();
     if($modoption[0] eq 'check')
     {
