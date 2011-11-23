@@ -52,9 +52,9 @@ sub BuildChart()
 {
     my $var1='';
     my $var2='';
-    my $start_axis='';
-    my $finish_axis='';
     my $maxvalue=0;#for define axis  value
+    my $totalvar1=0;
+    my $totalvar2=0;
     my $labelx='';#Label value for x axis
     my %SQL_SRC=('Loyalty'=>"SELECT MONTH(DATE),SUM(IF(ANSWER>0,1,0)),COUNT(ANSWER) FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]' GROUP BY MONTH(DATE) ORDER BY DATE",
                  'Clickability'=>"SELECT MONTH(DATE), COUNT(URL), COUNT(REFERER) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY MONTH(DATE) ORDER BY DATE",
@@ -68,18 +68,13 @@ sub BuildChart()
     {
         print "$ref->[0]\t$ref->[1]\t$ref->[2]\n"; #Display data
         $var1=$var1."$ref->[1],";
+        $totalvar1=$totalvar1+$var1;
         $var2=$var2."$ref->[2],";
+        $totalvar2=$totalvar2+$var2;
         $maxvalue=$ref->[1] if $ref->[1]>$maxvalue;
         $labelx=$labelx."$ref->[0]|";
-        #if(!$start_axis)#Устанавливаем начало и окончание периода для оси X
-        #{
-        #    $start_axis=$ref->[0];
-        #}
-        #else
-        #{
-        #    $finish_axis=$ref->[0];
-        #}
     }
+    print "------\nTotal\t$totalvar1\t$totalvar2";
     chop $var1;
     chop $var2;
     #Заполнение графиков данными
