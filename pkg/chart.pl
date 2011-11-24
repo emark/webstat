@@ -81,12 +81,12 @@ sub BuildChart()
     print "---\nTotal\t$totalvar";
     chop $var;
     #Заполнение графиков данными
-    my %IMG_SRC=('CpM'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chs=500x325&cht=lc&chco=3D7930&chds=0,$maxvalue&chd=t:$var&chg=14.3,-1,1,1&chls=1&chm=B,C5D4B5BB,0,0,0&chtt=Data+for+$_[2]",
-                 'CpD'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var&chtt=Data+for+$_[2]",
-                 'CpH'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var&chtt=Data+for+$_[2]",
-                 'UpM'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chs=500x325&cht=lc&chco=00799B&chds=0,$maxvalue&chd=t:$var&chg=14.3,-1,1,1&chls=1&chm=B,ADDDEABB,0,0,0&chtt=Data+for+$_[2]",
-                 'UpD'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=00ACDC&chds=0,$maxvalue&chd=t:$var&chtt=Data+for+$_[2]",
-                 'UpH'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=500x325&cht=bvg&chco=00ACDC&chds=0,$maxvalue&chd=t:$var&chtt=Data+for+$_[2]",
+    my %IMG_SRC=('CpM'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chs=720x400&cht=lc&chco=3D7930&chds=0,$maxvalue&chd=t:$var&chg=14.3,-1,1,1&chls=1&chm=B,C5D4B5BB,0,0,0&chtt=Data+for+$_[2]",
+                 'CpD'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=720x400&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var&chtt=Data+for+$_[2]",
+                 'CpH'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=720x400&cht=bvg&chco=A2C180&chds=0,$maxvalue&chd=t:$var&chtt=Data+for+$_[2]",
+                 'UpM'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chs=720x400&cht=lc&chco=00799B&chds=0,$maxvalue&chd=t:$var&chg=14.3,-1,1,1&chls=1&chm=B,ADDDEABB,0,0,0&chtt=Data+for+$_[2]",
+                 'UpD'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=720x400&cht=bvg&chco=00ACDC&chds=0,$maxvalue&chd=t:$var&chtt=Data+for+$_[2]",
+                 'UpH'=>"http://chart.apis.google.com/chart?chxl=1:|$labelx&chxr=0,0,$maxvalue&chxt=y,x&chbh=a&chs=720x400&cht=bvg&chco=00ACDC&chds=0,$maxvalue&chd=t:$var&chtt=Data+for+$_[2]",
                 );
     print '</pre><center>';
     print '<img src="';
