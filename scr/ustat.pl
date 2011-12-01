@@ -22,7 +22,8 @@ my $track='';
 
 if($url && $referer ne '')
 {
-    $referer=~s/http:\/\/$host//;#Drop htostname from Referer
+    $referer=~s/http:\/\///;#Drop http:// from Referer
+    $referer=~s/$host//;#Drop hostname from Referer
     $url=~s/^url=//;#remove url prefix
     $url=~s/\@.*//;#remove track variable
     $user_agent=substr ($ENV{'HTTP_USER_AGENT'},0,80);#cut length USER_AGENT to 80ch
