@@ -109,7 +109,7 @@ sub CreateLink(){
             $link{$dbh->last_insert_id('','','LINKS','id')}=$content;
         }
         foreach my $key(keys%link){
-            print textarea('link',"<a href\"http://go.web2buy.ru/l/$key/link.html\" rel=\"nofollow\" target=_blank>$link{$key}</a>",10,50);
+            print textarea('link',"<a href=\"http://go.web2buy.ru/l/$key/link.html\" rel=\"nofollow\" target=_blank>$link{$key}</a>",10,50);
         }
     }
 }
