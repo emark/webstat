@@ -3,6 +3,7 @@ use strict;
 use DBI;
 use CGI qw/:standard/; #-debug
 use CGI::Carp 'fatalsToBrowser';
+use utf8;
 use constant VERSION=>1.2;
 require 'pkg/datecal.pl';
 require 'sys/syspkg.pl';

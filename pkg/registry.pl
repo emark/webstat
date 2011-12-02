@@ -20,7 +20,7 @@ BEGIN;
 sub Init()
 {
     @modoption=@_;
-    if($modoption[0] eq 'export' && @modoption>1) #Если выбран хотя бы один элемент
+    if($modoption[0] eq 'export' && @modoption>2) #Если выбран хотя бы один элемент
     {
         print header(-charset=>'UTF-8',
                      -type=>'text/plain',
@@ -77,16 +77,24 @@ sub ExportCSV()
     $SQL="SET NAMES UTF8";
     $sth=$dbh->prepare($SQL);
     $sth->execute();
-    if(!$_[1]) #Первый запуск процедуры
+    if(!$_[2]) #Первый запуск процедуры
     {
-        $SQL="SELECT ID,URL FROM COMPANYREF ORDER BY ID";
-        $sth=$dbh->prepare($SQL);
-        $sth->execute;
-        print start_form(-target=>'_blank');
+        print start_form(-target=>'_self');
         print hidden(-name=>'module',
                      -value=>$module);
         print hidden(-name=>'modoption',
                      -value=>'export');
+        print '<P>Select category <select name=modoption>';
+        $SQL="SELECT CATEGORY.id,CATEGORY.name FROM CATEGORY";
+        $sth=$dbh->prepare($SQL);
+        $sth->execute;
+        while($ref=$sth->fetchrow_hashref){
+            print "<option value=$ref->{'id'}>$ref->{'name'}";
+        }
+        print '</select></P>';
+        $SQL="SELECT ID,URL FROM COMPANYREF ORDER BY ID";
+        $sth=$dbh->prepare($SQL);
+        $sth->execute;
         my $n=0;
         while ($ref=$sth->fetchrow_hashref)
         {
@@ -104,18 +112,25 @@ sub ExportCSV()
     else
     {
         my @id=@_;
-        shift @id;
-        $SQL="SELECT ID,URL,EMAIL,TEL FROM COMPANYREF WHERE ID=0 ";
+        shift @id;#Drop command
+        my $catid=shift @id;#Get category id
+        foreach my $key(@id){
+            my $linkid=$dbh->selectrow_array("SELECT LINKS.id FROM LINKS WHERE LINKS.catid=$catid AND LINKS.companyid=$key");
+            $dbh->do("INSERT INTO LINKS(id,catid,companyid) VALUES(NULL,$catid,$key)") unless $linkid;
+        }
+
+        #Generating HTML Link code
+        $SQL="SELECT LINKS.id AS LINKID,COMPANYREF.URL,COMPANYREF.ORGANIZATION,COMPANYREF.EMAIL,COMPANYREF.TEL FROM LINKS INNER JOIN COMPANYREF ON LINKS.companyid=COMPANYREF.ID WHERE COMPANYREF.ID=0 ";
         foreach my $key(@id)
         {
-            $SQL=$SQL." OR ID=$key";
+            $SQL=$SQL." OR COMPANYREF.ID=$key";
         }
         $sth=$dbh->prepare($SQL);
         $sth->execute;#print $SQL;
         my $pnum=0;
         while ($ref=$sth->fetchrow_hashref)
         {
-            print "<a href=\"http://www.web2buy.ru/link/?url=$ref->{'URL'}\" title='Переход в интернет-магазин' target=_blank>$ref->{'URL'}</a><P id=\"shopinfo-$pnum\"><a href=\"#1\" onClick=\"javascript:ShopInfo('$ref->{'URL'}','shopinfo-$pnum')\" title='ОГРН, условия доставки, оплаты'>Подробнее</a></P>;$ref->{'URL'};$ref->{'EMAIL'};$ref->{'TEL'}\n";
+            print "<a href=\"http://go.web2buy.ru/r/$ref->{'LINKID'}/link.html\" title='Переход по внешней ссылке' rel=\"nofollow\" target=_blank>$ref->{'ORGANIZATION'}</a>;<P id=\"shopinfo-$pnum\"><a href=\"#1\" onClick=\"javascript:ShopInfo('$ref->{'URL'}','shopinfo-$pnum')\" title='ОГРН, условия доставки, оплаты'>Подробнее</a></P>;$ref->{'URL'};$ref->{'EMAIL'};$ref->{'TEL'}\n";
             $pnum++;
         }
     }
