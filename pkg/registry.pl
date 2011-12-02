@@ -33,10 +33,12 @@ sub Init()
         #print @modoption; #Developer mode
         my %pages=('check'=>'Check URL',
                    'export'=>'Export',
+                   'link'=>'Create link',
                    );
         my %pagetitle=('check'=>'Check URL', #Отображение в заголовке текущего действия
                    'export'=>'CSV export',
-                   'save'=>'Save changes'
+                   'save'=>'Save changes',
+                   'link'=>'Generate new link',
                    );
         print "<P align=center>";
         foreach my $key(keys %pages)
@@ -52,14 +54,12 @@ sub Init()
     if($modoption[0] eq 'check')
     {
         &CheckURLForm($modoption[1]);
-    }
-    elsif($modoption[0] eq 'save')
-    {
+    }elsif($modoption[0] eq 'save'){
         &SaveCompanyForm(@modoption)
-    }
-     elsif($modoption[0] eq 'export')
-    {
+    }elsif($modoption[0] eq 'export'){
         &ExportCSV(@modoption)
+    }elsif($modoption[0] eq 'link'){
+        &CreateLink(@modoption)
     }
     &Disconnect($modoption[0]);
     if($modoption[0] eq 'export' && @modoption>1)
@@ -68,6 +68,49 @@ sub Init()
     }else
     {
         &main::HTMLfinish;        
+    }
+}
+
+#Createing new link
+sub CreateLink(){
+    if(!$_[2]){#Starting app
+        print start_form(-target=>'_self');
+        print hidden(-name=>'module',
+                     -value=>$module);
+        print hidden(-name=>'modoption',
+                     -value=>'link');
+        print '<P>Select category <select name=modoption>';
+        $SQL="SELECT CATEGORY.id,CATEGORY.name FROM CATEGORY";
+        $sth=$dbh->prepare($SQL);
+        $sth->execute;
+        while($ref=$sth->fetchrow_hashref){
+            print "<option value=$ref->{'id'}>$ref->{'name'}";
+        }
+        print '</select>';
+        print textfield(-name=>'modoption',-size=>50);
+        print submit(-value=>'Create');
+        print end_form;
+        print '</P>';
+    }else{#Generate link
+        my $catid=$_[1];
+        my $content=$_[2];
+        my %link=();
+        $SQL="SELECT l.id,l.content FROM LINKS l WHERE l.content=\"$content\" AND l.catid=$catid";
+        $sth=$dbh->prepare($SQL);
+        $sth->execute;
+        if($sth->rows){
+            print p('Existing link');
+            while($ref=$sth->fetchrow_hashref){
+                $link{$ref->{'id'}}=$ref->{'content'};
+            }
+        }else{
+            print p('Generate new link');
+            $dbh->do("INSERT INTO LINKS(id,catid,companyid,content) VALUES (NULL,$catid,1,\"$content\")");
+            $link{$dbh->last_insert_id('','','LINKS','id')}=$content;
+        }
+        foreach my $key(keys%link){
+            print textarea('link',"<a href\"http://go.web2buy.ru/l/$key/link.html\" rel=\"nofollow\" target=_blank>$link{$key}</a>",10,50);
+        }
     }
 }
 
