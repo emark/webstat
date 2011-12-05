@@ -27,7 +27,7 @@ if($url && $referer ne '')
     $url=~s/^url=//;#remove url prefix
     #$url=~s/\@.*//;#remove track variable
     $user_agent=substr ($ENV{'HTTP_USER_AGENT'},0,80);#cut length USER_AGENT to 80ch
-    $SQL="INSERT INTO URLSTAT(URL,DATE,IP,REFERER,USER_AGENT) VALUES('$url',NOW(),'$ip','$referer','$user_agent')";
+    $SQL="INSERT INTO URLSTAT(URL,DATE,IP,REFERER,USER_AGENT,TRACK) VALUES('$url',NOW(),'$ip','$referer','$user_agent','direct')";
     $sth=$dbh->prepare($SQL);
     $sth->execute();
     print $query->redirect('http://'.$url);        
