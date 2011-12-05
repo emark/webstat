@@ -60,7 +60,7 @@ sub QueryClickability()
     my %invert_types=('URL'=>'REFERER',
                'REFERER'=>'URL');
     my %domain=('URL'=>'http://',
-                'REFERER'=>'http://www.web2buy.ru'
+                #'REFERER'=>'http://www.web2buy.ru'
                );
     $SQL="SELECT $_[2],COUNT(URL) AS CLICKABILITY FROM URLSTAT WHERE LENGTH(REFERER)>0 AND DATE>='$_[0]' AND DATE<='$_[1]' ";
     if($_[3] eq 'open'){
@@ -77,11 +77,11 @@ sub QueryClickability()
             $n++;
             $bgcolor=&Syspkg::Rowcolor($n);#Подсветка строк таблицы
             $name=substr($ref->{$_[2]},0,250);
-            $name=~s/http:\/\/www\.web2buy\.ru//;#Удаляем имя хоста
+            #$name=~s/http:\/\/www\.web2buy\.ru//;#Удаляем имя хоста
             $totalclicks=$totalclicks+$ref->{'CLICKABILITY'};
             if($n<=$rowlimit || $_[3])
             {
-                print "<tr bgcolor=$bgcolor><td>$n</td><td><a href=\"$domain{$_[2]}$name\" target=_blank title='Open in new window'>$name</a>&nbsp;<a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$invert_pages{$_[2]}:open:$name\" target=_self title='Open'>+</a></td><td>$ref->{'CLICKABILITY'}</td></tr>\n";
+                print "<tr bgcolor=$bgcolor><td>$n</td><td><a href=\"http://$name\" target=_blank title='Open in new window'>$name</a>&nbsp;<a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$invert_pages{$_[2]}:open:$name\" target=_self title='Open'>+</a></td><td>$ref->{'CLICKABILITY'}</td></tr>\n";
             }
         }
         if(!$_[3] && $n>$rowlimit)#Если строк больше rowlimit, показыаем тег more
