@@ -24,10 +24,10 @@ sub Init()
                'Posts'=>'REFERER',
                ''=>'URL'#default page
                );
-    my @modoption=('','','');
+    my @modoption=('','','',0);
     if($_[2])
     {
-        @modoption=split (/:/,$_[2]);
+        @modoption=split(/:/,$_[2]);
         $modoption=$_[2];#Определяем глобальную переменную
     }    
     $dbh=DBI->connect(&Syspkg::Static($::dbconf));
@@ -41,12 +41,24 @@ sub Init()
     print "<br>--<i>$modoption[0]</i>--";
     print '<br/>'.$modoption[2] if($modoption[2]);
     print '</P>';
-    &QueryClickability($_[0],$_[1],$pages{$modoption[0]},$modoption[1],$modoption[2]);
+    my @track=('direct','redirect');#Define tracking marker
+    my $x=0;
+    foreach my $key(@track){#Print track selection
+        print "<a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$modoption[0]:::$x\">$key</a>&nbsp;";
+        $x++;
+    }
+    print "<P>Used marker: $track[$modoption[3]]</P>";
+    &QueryClickability($_[0],
+                       $_[1],
+                       $pages{$modoption[0]},
+                       $modoption[1],
+                       $modoption[2],
+                       $track[$modoption[3]]);
     &Disconnect;
 }
 
 #Процедура подсчета кликабельности
-#USAGE: $date_in,$date_out,$page(EXP),$expand || $show,FILTER
+#USAGE: $date_in,$date_out,$page(EXP),$expand || $show,FILTER,track
 #EXP: URL, REFERER
 sub QueryClickability()
 {
@@ -62,7 +74,7 @@ sub QueryClickability()
     my %domain=('URL'=>'http://',
                 #'REFERER'=>'http://www.web2buy.ru'
                );
-    $SQL="SELECT $_[2],COUNT(URL) AS CLICKABILITY FROM URLSTAT WHERE LENGTH(REFERER)>0 AND DATE>='$_[0]' AND DATE<='$_[1]' ";
+    $SQL="SELECT $_[2],COUNT(URL) AS CLICKABILITY FROM URLSTAT WHERE LENGTH(REFERER)>0 AND DATE>='$_[0]' AND DATE<='$_[1]' AND TRACK='$_[5]'";
     if($_[3] eq 'open'){
         $SQL=$SQL." AND $invert_types{$_[2]} LIKE '%$_[4]%'";#Фильтрация по типу URL || REFERRER
     }
