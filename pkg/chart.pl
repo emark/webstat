@@ -30,11 +30,14 @@ sub Init()
                ''=>'CpH'#default page
                );
     my @sortpages=('CPH','CPD','CPM','UPH','UPD','UPM');#Sorting pages
-    my @modoption=('','');
+    my @modoption=('',0);
     if($_[2])
     {
-        @modoption=split (/:/,$_[2]);
-        $modoption=$_[2];#Определяем глобальную переменную    
+        $modoption=$_[2];#Определяем глобальную переменную
+        my @tmpmodoption=split(/:/,$_[2]);
+        for(my $x=0;$x<@tmpmodoption;$x++){
+            $modoption[$x]=$tmpmodoption[$x]
+        }  
     }    
     $dbh=DBI->connect(&Syspkg::Static($::dbconf));
     $::dbconf=undef;#For close warning
@@ -45,13 +48,19 @@ sub Init()
         print "<a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$key\">$key</a>&nbsp";
     }
     print "<br>--<i>$modoption[0]</i>--</P>";
-    &BuildChart($_[0],$_[1],$pages{$modoption[0]});
+    my @track=('direct','redirect');#Define tracking marker
+    my $t=0;
+    foreach my $key(@track){#Print track selection
+        print "<a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=$modoption[0]:$t\">$key</a>&nbsp;";
+        $t++;
+    }
+    print "<P>Used marker: $track[$modoption[1]]</P>";
+    &BuildChart($_[0],$_[1],$pages{$modoption[0]},$track[$modoption[1]]);
     &Disconnect;
 }
 
 #Процедура визуализации данных
-#USAGE: $date_in,$date_out,$modoption(page)
-#Pages: Loyalty, Clickability, Ubh, Ubd
+#USAGE: $date_in,$date_out,$modoption(page),$track
 sub BuildChart()
 {
     my $var='';
@@ -59,12 +68,12 @@ sub BuildChart()
     my $totalvar=0;
     my $labelx='';#Label value for x axis
     my %SQL_SRC=('Loyalty'=>"SELECT MONTH(DATE),SUM(IF(ANSWER>0,1,0)),COUNT(ANSWER) FROM POSTSTAT WHERE DATE>='$_[0]' AND DATE<='$_[1]' GROUP BY MONTH(DATE) ORDER BY DATE",
-                 'CpM'=>"SELECT MONTH(DATE), COUNT(URL) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY MONTH(DATE) ORDER BY DATE",
-                 'CpD'=>"SELECT DAY(DATE) AS DAY,COUNT(IP) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY DAY ORDER BY DAY",
-                 'CpH'=>"SELECT HOUR(DATE) AS HOUR,COUNT(IP) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY HOUR ORDER BY HOUR",
-                 'UpM'=>"SELECT DATE,SUM(IP) FROM (SELECT MONTH(DATE) AS DATE,1 AS IP FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY IP) AS T1 GROUP BY DATE ORDER BY DATE",
-                 'UpD'=>"SELECT DATE,SUM(IP) FROM (SELECT DAY(DATE) AS DATE,1 AS IP FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY IP) AS T1 GROUP BY DATE ORDER BY DATE",
-                 'UpH'=>"SELECT DATE,SUM(IP) FROM (SELECT HOUR(DATE) AS DATE,1 AS IP FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') GROUP BY IP) AS T1 GROUP BY DATE ORDER BY DATE",
+                 'CpM'=>"SELECT MONTH(DATE), COUNT(URL) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') AND TRACK=\"$_[3]\" GROUP BY MONTH(DATE) ORDER BY DATE",
+                 'CpD'=>"SELECT DAY(DATE) AS DAY,COUNT(IP) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') AND TRACK=\"$_[3]\" GROUP BY DAY ORDER BY DAY",
+                 'CpH'=>"SELECT HOUR(DATE) AS HOUR,COUNT(IP) FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') AND TRACK=\"$_[3]\" GROUP BY HOUR ORDER BY HOUR",
+                 'UpM'=>"SELECT DATE,SUM(IP) FROM (SELECT MONTH(DATE) AS DATE,1 AS IP FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') AND TRACK=\"$_[3]\" GROUP BY IP) AS T1 GROUP BY DATE ORDER BY DATE",
+                 'UpD'=>"SELECT DATE,SUM(IP) FROM (SELECT DAY(DATE) AS DATE,1 AS IP FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') AND TRACK=\"$_[3]\" GROUP BY IP) AS T1 GROUP BY DATE ORDER BY DATE",
+                 'UpH'=>"SELECT DATE,SUM(IP) FROM (SELECT HOUR(DATE) AS DATE,1 AS IP FROM URLSTAT WHERE LENGTH(REFERER)>0 AND (DATE>='$_[0]' AND DATE<='$_[1]') AND TRACK=\"$_[3]\" GROUP BY IP) AS T1 GROUP BY DATE ORDER BY DATE",
                 );
     $sth=$dbh->prepare($SQL_SRC{$_[2]});
     #print $SQL_SRC{$_[2]};

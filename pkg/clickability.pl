@@ -27,8 +27,11 @@ sub Init()
     my @modoption=('','','',0);
     if($_[2])
     {
-        @modoption=split(/:/,$_[2]);
         $modoption=$_[2];#Определяем глобальную переменную
+        my @tmpmodoption=split(/:/,$_[2]);
+        for(my $x=0;$x<@tmpmodoption;$x++){
+            $modoption[$x]=$tmpmodoption[$x]
+        }        
     }    
     $dbh=DBI->connect(&Syspkg::Static($::dbconf));
     $::dbconf=undef;
