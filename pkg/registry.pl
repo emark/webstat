@@ -135,20 +135,24 @@ sub ExportCSV()
             print "<option value=$ref->{'id'}>$ref->{'name'}";
         }
         print '</select></P>';
-        $SQL="SELECT ID,URL FROM COMPANYREF ORDER BY ID";
+        $SQL="SELECT ID,URL,EMAIL,TEL,ORGANIZATION FROM COMPANYREF ORDER BY ID";
         $sth=$dbh->prepare($SQL);
         $sth->execute;
         my $n=0;
+        print '<table>';
         while ($ref=$sth->fetchrow_hashref)
         {
             $n++;
-            print "$n. ";
+            print "<tr><td>$n.</td><td>";
             print checkbox(-name=>'modoption',
                            -value=>$ref->{'ID'},
                            -label=>''
                            );
-            print "<a href=\"?module=$module&modoption=check&modoption=$ref->{'URL'}\">$ref->{'URL'}</a><br/>";
+            print "<a href=\"?module=$module&modoption=check&modoption=$ref->{'URL'}\">$ref->{'ORGANIZATION'}";
+            print 'null' unless $ref->{'ORGANIZATION'};
+            print "</a></td><td>$ref->{'URL'}</td><td>$ref->{'EMAIL'}</td><td>$ref->{'TEL'}</td></tr>";
         }
+        print '</table>';
         print submit(-value=>'Export');
         print end_form;
     }
