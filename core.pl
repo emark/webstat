@@ -12,6 +12,7 @@ my @modules=(require 'pkg/welcome.pl',
              require 'pkg/clickability.pl',
              require 'pkg/chart.pl',
              require 'pkg/registry.pl',
+             require 'pkg/links.pl',
              );
 our $dbconf='db.conf';#Database configfile
 my $module=param('module') || '';
@@ -32,7 +33,7 @@ sub HTMLDisplay()#Generate HTML headers & content
                      );
     print '<P class=presetdates>';
     &Datecal::PresetDates($module);
-    print '</P><P><SELECT ID=module NAME=module>';
+    print '</P><P>Module: <SELECT ID=module NAME=module>';
     foreach my $key(@modules)
     {
         print "<OPTION VALUE='$key'";
@@ -81,6 +82,9 @@ sub StartModule()#Starting selected module
     }elsif($module eq $modules[3])
     {
         &Registry::Init(@modoption);
+    }elsif($module eq $modules[4])
+    {
+        &Links::Init(@modoption);
     }else#Default module
     {
         &Welcome::Init(@modoption);
