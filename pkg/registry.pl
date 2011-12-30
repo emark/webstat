@@ -1,7 +1,6 @@
 #Company database manager
 package Registry;
 use strict;
-use CGI qw/:standard/;
 use constant VERSION=>0.3;
 
 #Database description
@@ -20,9 +19,9 @@ BEGIN;
 sub Init()
 {
     @modoption=@_;#Get form data
-    if($modoption[1]) #If export to output file
+    if($modoption[1]==1) #If export to output file
     {
-        print header(-charset=>'UTF-8',
+        print &main::header(-charset=>'UTF-8',
                      -type=>'text/plain',
                      -attachment=>'export.csv'
                      );
@@ -75,13 +74,9 @@ sub ExportCSV()
     $sth->execute();
     if(!$_[2]) #If catid undef = first start sub;
     {
-        print start_form(-target=>'_self',
-                         -method=>'get',
-                         -action=>'?');
-        print hidden(-name=>'module',
-                     -value=>$module);
-        print hidden(-name=>'modoption',
-                     -value=>'export');
+        print '<form name="CheckURL" method="post" target="_self" action="?">';
+        print "<input type=hidden name=module value=\"$module\">";
+        print '<input type=hidden name=modoption value="export">';
         print '<P>Create output file <select name="modoption"><option value=0 selected>No<option value=1>Yes</select>&nbsp;';
         print 'Select category <select name=modoption>';
         $SQL="SELECT CATEGORY.id,CATEGORY.name FROM CATEGORY";
@@ -106,8 +101,8 @@ sub ExportCSV()
             print "</a></td><td>$ref->{'URL'}</td><td>$ref->{'EMAIL'}</td><td>$ref->{'TEL'}</td></tr>";
         }
         print '</table>';
-        print submit(-value=>'Export');
-        print end_form;
+        print '<input type=submit value="Export">';
+        print '</form>';
     }
     else
     {
@@ -136,21 +131,19 @@ sub ExportCSV()
                 $pnum++;
             }
         }else{
-            print p({align=>'center'},'Links are created');
+            print '<P align="center">Links are created</P>';
         }
     }
 }
 
 sub CheckURLForm()
 {
-    print start_form(-name=>'CheckURL',
-                     -method=>'post');
+    print '<form name="CheckURL" method="post">';
     print '<input type=hidden name=modoption value=check>';
     print "<input type=text name=modoption size=25 value='$_[0]'>";
-    print submit(-value=>'Check');
-    print hidden(-name=>'module',
-                 -value=>$module);
-    print end_form();
+    print '<input type=submit value="Check">';
+    print "<input type=hidden name=module value=\"$module\">";
+    print '</form>';
     if($_[0])
     {
         &CheckURL($_[0]);
@@ -163,8 +156,7 @@ sub CompanyForm()
 {
     #print @modoption;
     my %companyreg=@_;
-    print start_form(-name=>'CompanyForm',
-                     -method=>'post');
+    print '<form name="CompanyForm" method="post">';
     print '<input type=hidden value=save name=modoption>';
     print "<input type=hidden value='$companyreg{'URL'}' name=modoption>";
     print '<table border=0>';
@@ -185,16 +177,16 @@ sub CompanyForm()
     print &SelectHTML($companyreg{'CASHBACK'}).'&nbsp;Срок и порядок возврата (надл. кач.)<br/>';
     print "<input type=text size=4 name=modoption value='$companyreg{'GOODBACKDAYS'}' title='Срок возврата тов. надл.кач.'>&nbsp;Срок возврата товара<br/>";
     print "<input type=hidden name=modoption value=$companyreg{'SYSDATE'}>";
-    print p("Дата регистрации (изменения): $companyreg{'SYSDATE'}");
+    print "Дата регистрации (изменения): $companyreg{'SYSDATE'}";
     print '</td><td>';
-    print p('Информация о доставке');
+    print 'Информация о доставке';
     print &SelectHTML($companyreg{'DT_MAIL'}).'&nbsp;Почта РФ<br/>';
     print &SelectHTML($companyreg{'DT_CC'}).'&nbsp;Курьерские компании<br/>';
     print &SelectHTML($companyreg{'DT_TC'}).'&nbsp;Транспортные компании<br/>';
     print &SelectHTML($companyreg{'DT_CR'}).'&nbsp;Курьер<br/>';
     print &SelectHTML($companyreg{'DT_PP'}).'&nbsp;Самовывоз<br/>';
     print '</td></tr><tr><td>';
-    print p('Информация об оплате');
+    print 'Информация об оплате';
     print &SelectHTML($companyreg{'PT_BP'}).'&nbsp;Банковский платеж<br/>';
     print &SelectHTML($companyreg{'PT_EM'}).'&nbsp;Электронные деньги<br/>';
     print &SelectHTML($companyreg{'PT_CH'}).'&nbsp;Платеж наличными<br/>';
@@ -204,11 +196,10 @@ sub CompanyForm()
     print '</td></tr><tr><td colspan=2 align=left>';
     print "<input type=text size=60 name=modoption value=\"$companyreg{'TAGS'}\">&nbsp;Метки магазина<br/>";
     print '</td></tr><tr><td colspan=2 align=left>';
-    print submit(-value=>'Save changes');
+    print '<input type=submit value="Save changes">';
     print '</td></tr></table>';
-    print hidden(-name=>'module',
-                 -value=>$module);
-    print end_form;
+    print "<input type=hidden name=module value=\"$module\">";
+    print '</form>';
 }
 
 #Процедура печати HTML тега SELECT
@@ -279,8 +270,8 @@ sub SaveCompanyForm()
     #print $SQL;
     $sth=$dbh->prepare($SQL);
     $sth->execute();
-    print p({-align=>'center'},"Registry information about $_[3] ($_[1]) is saved.");
-    print p({-align=>'center'},"Would you like to <a href=\"?module=$module&modoption=check&modoption=$_[1]\">see</a> it or <a href=\"?module=$module&modoption=check\">search</a> another url?");
+    print "<P align=center>Registry information about $_[3] ($_[1]) is saved.<br/>";
+    print "Would you like to <a href=\"?module=$module&modoption=check&modoption=$_[1]\">see</a> it or <a href=\"?module=$module&modoption=check\">search</a> another url?</P>";
     return 1;
 }
 
