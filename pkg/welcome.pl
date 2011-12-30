@@ -16,10 +16,10 @@ sub Init()
 {
     &main::HTMLDisplay;
     my @modoption=('','');
-    if($_[2])
+    if($_[0])
     {
-        @modoption=split (/:/,$_[2]);
-        $modoption=$_[2];#Define global var
+        @modoption=split (/:/,$_[0]);
+        $modoption=$_[0];#Define global var
     }  
     #Connection with database
     $dbh=DBI->connect(&Syspkg::Static($::dbconf));

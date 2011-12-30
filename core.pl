@@ -84,7 +84,7 @@ sub StartModule()#Starting selected module
         &Registry::Init(@modoption);
     }elsif($module eq $modules[4])
     {
-        &Links::Init(@modoption);
+        &Links::Init(Datecal::Period(),@modoption);
     }else#Default module
     {
         &Welcome::Init(@modoption);
