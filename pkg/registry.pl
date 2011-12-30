@@ -15,27 +15,26 @@ my @modoption='';
 BEGIN;
 
 #Процедура инициализации модуля
-#USAGE: $date_in,$date_out,$modoption(url)
+#USAGE: $modoption(url)
 #EXP: URL, REFERER
 sub Init()
 {
-    @modoption=@_;
-    if($modoption[0] eq 'export' && @modoption>2) #Если выбран хотя бы один элемент
+    @modoption=@_;#Get form data
+    if($modoption[1]) #If export to output file
     {
         print header(-charset=>'UTF-8',
                      -type=>'text/plain',
                      -attachment=>'export.csv'
                      );
-    }
-    else
-    {
+    }else{
         &main::HTMLDisplay;
+        #print "Modoption: ";while(<@_>){print $_} Develop mode
         #print @modoption; #Developer mode
         my %pages=('check'=>'Check URL',
                    'export'=>'Export',
                    );
         my %pagetitle=('check'=>'Check URL', #Отображение в заголовке текущего действия
-                   'export'=>'CSV export',
+                   'export'=>'Add links and CSV export',
                    'save'=>'Save changes',
                    );
         print "<P align=center>";
@@ -58,7 +57,7 @@ sub Init()
         &ExportCSV(@modoption)
     }
     &Disconnect($modoption[0]);
-    if($modoption[0] eq 'export' && @modoption>1)
+    if($modoption[0] eq 'export' && @modoption>3)
     {
         #Export CSV
     }else
@@ -70,17 +69,21 @@ sub Init()
 #Процедура экспорта данных реестра в формате CSV
 sub ExportCSV()
 {
+    
     $SQL="SET NAMES UTF8";
     $sth=$dbh->prepare($SQL);
     $sth->execute();
-    if(!$_[2]) #Первый запуск процедуры
+    if(!$_[2]) #If catid undef = first start sub;
     {
-        print start_form(-target=>'_self');
+        print start_form(-target=>'_self',
+                         -method=>'get',
+                         -action=>'?');
         print hidden(-name=>'module',
                      -value=>$module);
         print hidden(-name=>'modoption',
                      -value=>'export');
-        print '<P>Select category <select name=modoption>';
+        print '<P>Create output file <select name="modoption"><option value=0 selected>No<option value=1>Yes</select>&nbsp;';
+        print 'Select category <select name=modoption>';
         $SQL="SELECT CATEGORY.id,CATEGORY.name FROM CATEGORY";
         $sth=$dbh->prepare($SQL);
         $sth->execute;
@@ -97,10 +100,7 @@ sub ExportCSV()
         {
             $n++;
             print "<tr><td>$n.</td><td>";
-            print checkbox(-name=>'modoption',
-                           -value=>$ref->{'ID'},
-                           -label=>''
-                           );
+            print "<input type=checkbox name=\"modoption\" value=\"$ref->{'ID'}\">&nbsp;";
             print "<a href=\"?module=$module&modoption=check&modoption=$ref->{'URL'}\">$ref->{'ORGANIZATION'}";
             print 'null' unless $ref->{'ORGANIZATION'};
             print "</a></td><td>$ref->{'URL'}</td><td>$ref->{'EMAIL'}</td><td>$ref->{'TEL'}</td></tr>";
@@ -113,25 +113,30 @@ sub ExportCSV()
     {
         my @id=@_;
         shift @id;#Drop command
+        shift @id;#Drop export flag
         my $catid=shift @id;#Get category id
-        foreach my $key(@id){
+        foreach my $key(@id){#Creates links if not exists
             my $linkid=$dbh->selectrow_array("SELECT LINKS.id FROM LINKS WHERE LINKS.catid=$catid AND LINKS.companyid=$key");
             $dbh->do("INSERT INTO LINKS(id,catid,companyid,createdate) VALUES(NULL,$catid,$key,NOW())") unless $linkid;
         }
-
         #Generating HTML Link code
-        $SQL="SELECT LINKS.id AS LINKID,COMPANYREF.URL,COMPANYREF.ORGANIZATION,COMPANYREF.EMAIL,COMPANYREF.TEL FROM LINKS INNER JOIN COMPANYREF ON LINKS.companyid=COMPANYREF.ID WHERE COMPANYREF.ID=0 ";
-        foreach my $key(@id)
-        {
-            $SQL=$SQL." OR COMPANYREF.ID=$key";
-        }
-        $sth=$dbh->prepare($SQL);
-        $sth->execute;#print $SQL;
-        my $pnum=0;
-        while ($ref=$sth->fetchrow_hashref)
-        {
-            print "<a href=\"http://go.web2buy.ru/r/$ref->{'LINKID'}/link.html\" title='Переход по внешней ссылке' rel=\"nofollow\" target=_blank>$ref->{'ORGANIZATION'}</a>;<P id=\"shopinfo-$pnum\"><a href=\"#1\" onClick=\"javascript:ShopInfo('$ref->{'URL'}','shopinfo-$pnum')\" title='ОГРН, условия доставки, оплаты'>Подробнее</a></P>;$ref->{'URL'};$ref->{'EMAIL'};$ref->{'TEL'}\n";
-            $pnum++;
+        if($_[1]){
+            $SQL="SELECT LINKS.id AS LINKID,COMPANYREF.URL,COMPANYREF.ORGANIZATION,COMPANYREF.EMAIL,COMPANYREF.TEL FROM CATEGORY RIGHT JOIN LINKS ON CATEGORY.id=LINKS.catid LEFT JOIN COMPANYREF ON LINKS.companyid=COMPANYREF.ID WHERE CATEGORY.id=$catid AND (COMPANYREF.ID=0 ";
+            foreach my $key(@id)
+            {
+                $SQL=$SQL." OR COMPANYREF.ID=$key";
+            }
+            $SQL=$SQL.')';
+            $sth=$dbh->prepare($SQL);
+            $sth->execute;#print $SQL;
+            my $pnum=0;
+            while ($ref=$sth->fetchrow_hashref)
+            {
+                print "<a href=\"http://go.web2buy.ru/r/$ref->{'LINKID'}/link.html\" title='Переход по внешней ссылке' rel=\"nofollow\" target=_blank>$ref->{'ORGANIZATION'}</a>;<P id=\"shopinfo-$pnum\"><a href=\"#1\" onClick=\"javascript:ShopInfo('$ref->{'URL'}','shopinfo-$pnum')\" title='ОГРН, условия доставки, оплаты'>Подробнее</a></P>;$ref->{'URL'};$ref->{'EMAIL'};$ref->{'TEL'}\n";
+                $pnum++;
+            }
+        }else{
+            print p({align=>'center'},'Links are created');
         }
     }
 }
