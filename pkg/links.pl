@@ -2,7 +2,7 @@
 package Links;
 use strict;
 #use CGI qw/:standard/;
-use constant VERSION=>0.1;
+use constant VERSION=>0.2;
 
 #Database description
 my $dbh=undef;
@@ -44,7 +44,8 @@ sub Init()
 #ENV(date_in,date_out,page,catid,linktype,linkid)
 sub ManageLinks(){
     my $catid=$_[3];
-    my @linktype=('IS NULL','IS NOT NULL');
+    my @sqllinktype=('IS NULL','IS NOT NULL');
+    my @linktype=('r','l');
     $SQL="SET NAMES UTF8";
     $sth=$dbh->prepare($SQL);
     $sth->execute();
@@ -67,13 +68,13 @@ sub ManageLinks(){
     print "<input type=submit value='Show me links'></form></P>";
     #Generate links table
     $SQL="SELECT CATEGORY.name AS category,LINKS.id as linkid,LINKS.companyid,LINKS.content,LINKS.createdate,COMPANYREF.ORGANIZATION AS orgname,COMPANYREF.URL AS url FROM CATEGORY RIGHT JOIN LINKS ON CATEGORY.id=LINKS.catid LEFT JOIN COMPANYREF ON
-    LINKS.companyid=COMPANYREF.ID WHERE LINKS.content $linktype[$_[4]] ";
+    LINKS.companyid=COMPANYREF.ID WHERE LINKS.content $sqllinktype[$_[4]] ";
     $SQL=$SQL. "AND CATEGORY.id=$catid" if ($catid);
     $sth=$dbh->prepare($SQL);#print $SQL;
     $sth->execute;
-    print '<table border=1 cellpadding=3><tr><td>category</td><td>company</td><td>url</td><td>content</td><td>create</td><td>delete / edit</td></tr>';
+    print '<table border=1 cellpadding=3><tr><td>category</td><td>link</td><td>company</td><td>url</td><td>content</td><td>create</td><td>delete / edit</td></tr>';
     while($ref=$sth->fetchrow_hashref){
-        print "<tr><td>$ref->{'category'}</td><td><a href=\"?module=Registry&modoption=check&modoption=$ref->{'url'}\">$ref->{'orgname'}</a></td><td><a href=\"http://$ref->{'url'}\" target=_blank>$ref->{'url'}</a></td><td><a href=\"http://$ref->{'content'}\" target=_blank>$ref->{'content'}</a></td><td>$ref->{'createdate'}</td><td><a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=deletelink&modoption=$ref->{'linkid'}\">delete</a></td></tr>";
+        print "<tr><td>$ref->{'category'}</td><td><a href=\"http://go.web2buy.ru/$linktype[$_[4]]/$ref->{'linkid'}/link.html\" target=_blank title='Copy link target'>source</a></td><td><a href=\"?module=Registry&modoption=check&modoption=$ref->{'url'}\">$ref->{'orgname'}</a></td><td><a href=\"http://$ref->{'url'}\" target=_blank>$ref->{'url'}</a></td><td><a href=\"http://$ref->{'content'}\" target=_blank>$ref->{'content'}</a></td><td>$ref->{'createdate'}</td><td><a href=\"?date_in=$_[0]&date_out=$_[1]&module=$module&modoption=deletelink&modoption=$ref->{'linkid'}\">delete</a></td></tr>";
     }
     print '</table>';
 };
