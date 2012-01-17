@@ -98,7 +98,7 @@ sub ExportCSV()
             print "<input type=checkbox name=\"modoption\" value=\"$ref->{'ID'}\">&nbsp;";
             print "<a href=\"?module=$module&modoption=check&modoption=$ref->{'URL'}\">$ref->{'ORGANIZATION'}";
             print 'null' unless $ref->{'ORGANIZATION'};
-            print "</a></td><td>$ref->{'URL'}</td><td>$ref->{'EMAIL'}</td><td>$ref->{'TEL'}</td></tr>";
+            print "</a></td><td><a href=\"$ref->{'URL'}\" target=_blank>$ref->{'URL'}</a></td><td>$ref->{'EMAIL'}</td><td>$ref->{'TEL'}</td></tr>";
         }
         print '</table>';
         print '<input type=submit value="Export">';
