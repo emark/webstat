@@ -19,7 +19,7 @@ BEGIN;
 sub Init()
 {
     @modoption=@_;#Get form data
-    if($modoption[1]==1) #If export to output file
+    if($modoption[1] eq 'output') #If export to output file
     {
         print &main::header(-charset=>'UTF-8',
                      -type=>'text/plain',
@@ -27,10 +27,10 @@ sub Init()
                      );
     }else{
         &main::HTMLDisplay;
-        #print "Modoption: ";while(<@_>){print $_} Develop mode
+        #print "Modoption: ";while(<@_>){print $_} #Develop mode
         #print @modoption; #Developer mode
         my %pages=('check'=>'Check URL',
-                   'export'=>'Export',
+                   'export'=>'Catalog',
                    );
         my %pagetitle=('check'=>'Check URL', #Отображение в заголовке текущего действия
                    'export'=>'Add links and CSV export',
@@ -54,6 +54,8 @@ sub Init()
         &SaveCompanyForm(@modoption)
     }elsif($modoption[0] eq 'export'){
         &ExportCSV(@modoption)
+    }elsif($modoption[0] eq 'addlinks'){
+        &AddLinks(@modoption)
     }
     &Disconnect($modoption[0]);
     if($modoption[0] eq 'export' && @modoption>3)
@@ -77,7 +79,7 @@ sub ExportCSV()
         print '<form name="CheckURL" method="post" target="_self" action="?">';
         print "<input type=hidden name=module value=\"$module\">";
         print '<input type=hidden name=modoption value="export">';
-        print '<P>Create output file <select name="modoption"><option value=0 selected>No<option value=1>Yes</select>&nbsp;';
+        print '<P>Create output file <select name="modoption"><option value=0 selected>No<option value=output>Yes</select>&nbsp;';
         print 'Select category <select name=modoption>';
         $SQL="SELECT CATEGORY.id,CATEGORY.name FROM CATEGORY";
         $sth=$dbh->prepare($SQL);
@@ -138,7 +140,7 @@ sub ExportCSV()
 
 sub CheckURLForm()
 {
-    print '<form name="CheckURL" method="post">';
+    print '<form name="CheckURL" method="get">';
     print '<input type=hidden name=modoption value=check>';
     print "<input type=text name=modoption size=25 value='$_[0]'>";
     print '<input type=submit value="Check">';
@@ -200,6 +202,7 @@ sub CompanyForm()
     print '</td></tr></table>';
     print "<input type=hidden name=module value=\"$module\">";
     print '</form>';
+    &CategoryForm($companyreg{'ID'});
 }
 
 #Процедура печати HTML тега SELECT
@@ -299,6 +302,56 @@ sub CheckURL()
         }
     }
     return &CompanyForm(%companyreg);
+}
+
+#Print category form in CompanyCard
+sub CategoryForm(){
+    $SQL="SELECT C.id AS catid,C.describe AS catname FROM CATEGORY AS C";
+    $sth=$dbh->prepare($SQL);#print $SQL;
+    $sth->execute();
+    print '<form method=get>';
+    print '<p>Category</p>';
+    print "<input type=hidden name=module value=\"$module\">";
+    print '<input type=hidden name=modoption value="addlinks">';
+    print "<input type=hidden name=modoption value=\"$_[0]\">";
+    print '<select multiple="multiple" size="10" name=modoption>';
+    while($ref=$sth->fetchrow_hashref){
+        print "<option value=$ref->{'catid'}>".$ref->{'catname'};
+    }
+    print '</select><br/>';
+    print '<input type=submit value="Add links">';
+    print '</form>';
+}
+
+#Add category links
+sub AddLinks(){
+    my @id=@_;
+    shift @id;#Drop command
+    my $companyid=shift @id;
+    $SQL="SELECT C.id AS catid FROM CATEGORY AS C INNER JOIN LINKS ON C.id=LINKS.catid LEFT JOIN COMPANYREF ON LINKS.companyid=COMPANYREF.ID WHERE COMPANYREF.ID=$companyid";
+    $sth=$dbh->prepare($SQL);
+    $sth->execute;
+    my @existcat=();
+    my $n=0;
+    while($ref=$sth->fetchrow_hashref){
+        $existcat[$n]=$ref->{'catid'};
+        $n++;
+    }
+    my $check=1;
+    foreach my $key(@id){
+        foreach my $existcatid(@existcat){
+            if($key==$existcatid){
+                $check=0;
+            }
+        }
+        if($check==1){
+            $SQL="INSERT INTO LINKS(id,companyid,catid,createdate) VALUES(NULL,$companyid,$key,NOW())";
+            $sth=$dbh->prepare($SQL);
+            $sth->execute;
+        }
+        $check=1;
+    }
+    print '<p alilgn=center>Category links are created</p>';
 }
 
 sub Disconnect()
