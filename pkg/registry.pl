@@ -306,21 +306,32 @@ sub CheckURL()
 
 #Print category form in CompanyCard
 sub CategoryForm(){
+    my $companyid=$_[0];
+    print '<table><tr><td>Selected</td><td>Add category</td></tr><tr><td valign=top>';
+    #Select company category
+    $SQL="SELECT C.id as catid,C.describe AS catname,LINKS.id as linkid FROM CATEGORY AS C INNER JOIN LINKS ON C.id=LINKS.catid LEFT JOIN COMPANYREF ON LINKS.companyid=COMPANYREF.ID WHERE COMPANYREF.ID=$companyid";
+    $sth=$dbh->prepare($SQL);#print $SQL;
+    $sth->execute();
+    print '<UL>';
+    while($ref=$sth->fetchrow_hashref){
+        print "<LI>$ref->{'catname'} [<a href=\"?date_in=0&date_out=0&module=Links&modoption=deletelink&modoption=$ref->{'linkid'}\" target=_blank>x</a>]";
+    }
+    print '</UL></td><td>';
+    #Create category form
     $SQL="SELECT C.id AS catid,C.describe AS catname FROM CATEGORY AS C";
     $sth=$dbh->prepare($SQL);#print $SQL;
     $sth->execute();
     print '<form method=get>';
-    print '<p>Category</p>';
     print "<input type=hidden name=module value=\"$module\">";
     print '<input type=hidden name=modoption value="addlinks">';
-    print "<input type=hidden name=modoption value=\"$_[0]\">";
+    print "<input type=hidden name=modoption value=\"$companyid\">";
     print '<select multiple="multiple" size="10" name=modoption>';
     while($ref=$sth->fetchrow_hashref){
         print "<option value=$ref->{'catid'}>".$ref->{'catname'};
     }
     print '</select><br/>';
     print '<input type=submit value="Add links">';
-    print '</form>';
+    print '</form></td></tr></table>';
 }
 
 #Add category links
