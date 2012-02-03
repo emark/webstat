@@ -27,6 +27,7 @@ sub HTMLDisplay()#Generate HTML headers & content
     print header(-charset=>'UTF-8');
     print start_html(-title=>'Webstat '.VERSION);
     print &Syspkg::Static('style.css');
+    print "Root domain: <a href=\"http://$ENV{'HTTP_HOST'}\">$ENV{'HTTP_HOST'}</a>";
     print start_form(-name=>'DatePeriod',
                      -method=>'post',
                      -action=>'?'
@@ -44,7 +45,7 @@ sub HTMLDisplay()#Generate HTML headers & content
         print ">$key</OPTION>";
     }
     print '</SELECT>&nbsp;';
-    print submit();
+    print submit(-value=>'Open module');
     print '</P><P align=center>';
     &Datecal::Rewind($module);
     print textfield(-name=>'date_in',

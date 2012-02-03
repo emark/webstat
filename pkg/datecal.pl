@@ -91,7 +91,7 @@ sub PresetDates()
                      "Month;$month;$today",
                      "Year;$year;$today",
                      );
-    #print $today,$yesterday,$tommorow,$week;
+    print 'Period: ';
     foreach my $key(@PresetDates)
     {
         ($preset,$date_in,$date_out)=split(/;/,$key);
